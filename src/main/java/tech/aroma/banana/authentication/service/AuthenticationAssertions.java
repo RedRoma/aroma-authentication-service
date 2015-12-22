@@ -20,9 +20,13 @@ package tech.aroma.banana.authentication.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
+import tech.sirwellington.alchemy.annotations.arguments.NonNull;
+import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
+import tech.sirwellington.alchemy.arguments.FailedAssertionException;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -47,6 +51,21 @@ public final class AuthenticationAssertions
         checkThat(request)
             .throwing(ex -> new InvalidArgumentException("request missing"))
             .is(notNull());
+    }
+    
+    public static AlchemyAssertion<String> tokenInRepository(@NonNull TokenRepository repository) throws IllegalArgumentException
+    {
+        checkThat(repository)
+            .usingMessage("repository missing")
+            .is(notNull());
+        
+        return token ->
+        {
+            if (!repository.tokenExists(token))
+            {
+                throw new FailedAssertionException("Token does not exist: " + token);
+            }
+        };
     }
 
 }
