@@ -19,6 +19,7 @@ package tech.aroma.banana.authentication.service.operations;
 
 
 import com.google.inject.AbstractModule;
+import com.google.inject.TypeLiteral;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.thrift.authentication.service.CreateApplicationTokenRequest;
@@ -50,18 +51,30 @@ public final class AuthenticationOperationsModule extends AbstractModule
     @Override
     protected void configure()
     {
+        bind(new TypeLiteral<ThriftOperation<CreateApplicationTokenRequest, CreateApplicationTokenResponse>>() {})
+            .to(CreateApplicationTokenOperation.class);
+        
+        bind(new TypeLiteral<ThriftOperation<CreateUserTokenRequest, CreateUserTokenResponse>>() {})
+            .to(CreateUserTokenOperation.class);
+        
+        bind(new TypeLiteral<ThriftOperation<GetApplicationTokenInfoRequest, GetApplicationTokenInfoResponse>>() {})
+            .to(GetApplicationTokenInfoOperation.class);
+        
+        bind(new TypeLiteral<ThriftOperation<GetUserTokenInfoRequest, GetUserTokenInfoResponse>>() {})
+            .to(GetUserTokenInfoOperation.class);
+        
+        bind(new TypeLiteral<ThriftOperation<InvalidateApplicationTokenRequest, InvalidateApplicationTokenResponse>>() {})
+            .to(InvalidateApplicationTokenOperation.class);
+        
+        bind(new TypeLiteral<ThriftOperation<InvalidateUserTokenRequest, InvalidateUserTokenResponse>>() {})
+            .to(InvalidateUserTokenOperation.class);
+        
+        bind(new TypeLiteral<ThriftOperation<VerifyApplicationTokenRequest, VerifyApplicationTokenResponse>>() {})
+            .to(VerifyApplicationTokenOperation.class);
+        
+        bind(new TypeLiteral<ThriftOperation<VerifyUserTokenRequest, VerifyUserTokenResponse>>() {})
+            .to(VerifyUserTokenOperation.class);
         
     }
-    
-    
-    
-    private ThriftOperation<CreateApplicationTokenRequest, CreateApplicationTokenResponse> createApplicationTokenOperation;
-    private ThriftOperation<CreateUserTokenRequest, CreateUserTokenResponse> createUserTokenOperation;
-    private ThriftOperation<GetApplicationTokenInfoRequest, GetApplicationTokenInfoResponse> getApplicationTokenInfoOperation;
-    private ThriftOperation<GetUserTokenInfoRequest, GetUserTokenInfoResponse> getUserTokenInfoOperation;
-    private ThriftOperation<InvalidateApplicationTokenRequest, InvalidateApplicationTokenResponse> invalidateApplicationTokenOperation;
-    private ThriftOperation<InvalidateUserTokenRequest, InvalidateUserTokenResponse> invalidateUserTokenOperation;
-    private ThriftOperation<VerifyApplicationTokenRequest, VerifyApplicationTokenResponse> verifyApplicationTokenOperation;
-    private ThriftOperation<VerifyUserTokenRequest, VerifyUserTokenResponse> verifyUserTokenOperation;
     
 }
