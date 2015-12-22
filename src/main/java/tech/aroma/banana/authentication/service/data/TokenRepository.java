@@ -17,8 +17,6 @@
 
 package tech.aroma.banana.authentication.service.data;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
@@ -42,12 +40,7 @@ public interface TokenRepository
     
     Token getToken(@NonEmpty String tokenId) throws IllegalArgumentException, OperationFailedException;
     
-    default void saveToken(@NonNull Token token) throws IllegalArgumentException, OperationFailedException
-    {
-        saveToken(token, Duration.of(1, ChronoUnit.FOREVER));
-    }
-    
-    void saveToken(@NonNull Token token, Duration lifetime) throws IllegalArgumentException, OperationFailedException;
+    void saveToken(@NonNull Token token) throws IllegalArgumentException, OperationFailedException;
     
     List<Token> getTokensBelongingTo(String ownerId) throws IllegalArgumentException, OperationFailedException;
     
