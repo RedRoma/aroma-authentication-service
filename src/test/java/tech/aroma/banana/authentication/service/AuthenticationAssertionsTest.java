@@ -19,11 +19,18 @@ package tech.aroma.banana.authentication.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
+import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
+import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.StringGenerators.strings;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
@@ -37,6 +44,12 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
 public class AuthenticationAssertionsTest 
 {
 
+    @Mock
+    private TokenRepository tokenRepository;
+    
+    @GenerateString
+    private String token;
+    
     @Before
     public void setUp()
     {
@@ -59,6 +72,22 @@ public class AuthenticationAssertionsTest
         
         String string = one(strings());
         AuthenticationAssertions.checkRequestNotNull(string);
+    }
+
+    @Test
+    public void testTokenInRepository()
+    {
+        AlchemyAssertion<String> instance = AuthenticationAssertions.tokenInRepository(tokenRepository);
+        assertThat(instance, notNullValue());
+
+        when(tokenRepository.tokenExists(token))
+            .thenReturn(true);
+        instance.check(token);
+
+        when(tokenRepository.tokenExists(token))
+            .thenReturn(false);
+        assertThrows(() -> instance.check(token));
+
     }
 
 }
