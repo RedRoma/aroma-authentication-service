@@ -18,6 +18,7 @@ package tech.aroma.banana.authentication.service;
  */
 
 
+import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,9 @@ import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+
 /**
  * This is the Implementation of the {@linkplain AuthenticationService.Iface Banana Authentication Service.}
  * @author SirWellington
@@ -53,14 +57,46 @@ final class AuthenticationServiceImpl implements AuthenticationService.Iface
 {
     private final static Logger LOG = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
     
-    private ThriftOperation<CreateApplicationTokenRequest, CreateApplicationTokenResponse> createApplicationTokenOperation;
-    private ThriftOperation<CreateUserTokenRequest, CreateUserTokenResponse> createUserTokenOperation;
-    private ThriftOperation<GetApplicationTokenInfoRequest, GetApplicationTokenInfoResponse> getApplicationTokenInfoOperation;
-    private ThriftOperation<GetUserTokenInfoRequest, GetUserTokenInfoResponse> getUserTokenInfoOperation;
-    private ThriftOperation<InvalidateApplicationTokenRequest, InvalidateApplicationTokenResponse> invalidateApplicationTokenOperation;
-    private ThriftOperation<InvalidateUserTokenRequest, InvalidateUserTokenResponse> invalidateUserTokenOperation;
-    private ThriftOperation<VerifyApplicationTokenRequest, VerifyApplicationTokenResponse> verifyApplicationTokenOperation;
-    private ThriftOperation<VerifyUserTokenRequest, VerifyUserTokenResponse> verifyUserTokenOperation;
+    private final ThriftOperation<CreateApplicationTokenRequest, CreateApplicationTokenResponse> createApplicationTokenOperation;
+    private final ThriftOperation<CreateUserTokenRequest, CreateUserTokenResponse> createUserTokenOperation;
+    private final ThriftOperation<GetApplicationTokenInfoRequest, GetApplicationTokenInfoResponse> getApplicationTokenInfoOperation;
+    private final ThriftOperation<GetUserTokenInfoRequest, GetUserTokenInfoResponse> getUserTokenInfoOperation;
+    private final ThriftOperation<InvalidateApplicationTokenRequest, InvalidateApplicationTokenResponse> invalidateApplicationTokenOperation;
+    private final ThriftOperation<InvalidateUserTokenRequest, InvalidateUserTokenResponse> invalidateUserTokenOperation;
+    private final ThriftOperation<VerifyApplicationTokenRequest, VerifyApplicationTokenResponse> verifyApplicationTokenOperation;
+    private final ThriftOperation<VerifyUserTokenRequest, VerifyUserTokenResponse> verifyUserTokenOperation;
+
+    @Inject
+    AuthenticationServiceImpl(ThriftOperation<CreateApplicationTokenRequest, CreateApplicationTokenResponse> createApplicationTokenOperation,
+                              ThriftOperation<CreateUserTokenRequest, CreateUserTokenResponse> createUserTokenOperation,
+                              ThriftOperation<GetApplicationTokenInfoRequest, GetApplicationTokenInfoResponse> getApplicationTokenInfoOperation,
+                              ThriftOperation<GetUserTokenInfoRequest, GetUserTokenInfoResponse> getUserTokenInfoOperation,
+                              ThriftOperation<InvalidateApplicationTokenRequest, InvalidateApplicationTokenResponse> invalidateApplicationTokenOperation,
+                              ThriftOperation<InvalidateUserTokenRequest, InvalidateUserTokenResponse> invalidateUserTokenOperation,
+                              ThriftOperation<VerifyApplicationTokenRequest, VerifyApplicationTokenResponse> verifyApplicationTokenOperation,
+                              ThriftOperation<VerifyUserTokenRequest, VerifyUserTokenResponse> verifyUserTokenOperation)
+    {
+        checkThat(createApplicationTokenOperation,
+                  createUserTokenOperation,
+                  getApplicationTokenInfoOperation,
+                  getUserTokenInfoOperation,
+                  invalidateApplicationTokenOperation,
+                  invalidateUserTokenOperation,
+                  verifyApplicationTokenOperation,
+                  verifyUserTokenOperation)
+            .are(notNull());
+        
+        this.createApplicationTokenOperation = createApplicationTokenOperation;
+        this.createUserTokenOperation = createUserTokenOperation;
+        this.getApplicationTokenInfoOperation = getApplicationTokenInfoOperation;
+        this.getUserTokenInfoOperation = getUserTokenInfoOperation;
+        this.invalidateApplicationTokenOperation = invalidateApplicationTokenOperation;
+        this.invalidateUserTokenOperation = invalidateUserTokenOperation;
+        this.verifyApplicationTokenOperation = verifyApplicationTokenOperation;
+        this.verifyUserTokenOperation = verifyUserTokenOperation;
+    }
+    
+    
     
     @Override
     public double getApiVersion() throws TException
@@ -72,14 +108,18 @@ final class AuthenticationServiceImpl implements AuthenticationService.Iface
     public CreateApplicationTokenResponse createApplicationToken(CreateApplicationTokenRequest request) throws OperationFailedException,
                                                                                                                TException
     {
-        throw new OperationFailedException("Not Implemented Yet!");
+        AuthenticationAssertions.checkRequestNotNull(request);
+        
+        return createApplicationTokenOperation.process(request);
     }
     
     @Override
     public CreateUserTokenResponse createUserToken(CreateUserTokenRequest request) throws OperationFailedException,
                                                                                           TException
     {
-        throw new OperationFailedException("Not Implemented Yet!");
+        AuthenticationAssertions.checkRequestNotNull(request);
+        
+        return createUserTokenOperation.process(request);
     }
     
     @Override
@@ -87,14 +127,18 @@ final class AuthenticationServiceImpl implements AuthenticationService.Iface
                                                                                                                   InvalidTokenException,
                                                                                                                   TException
     {
-        throw new OperationFailedException("Not Implemented Yet!");
+        AuthenticationAssertions.checkRequestNotNull(request);
+        
+        return getApplicationTokenInfoOperation.process(request);
     }
     
     @Override
     public GetUserTokenInfoResponse getUserTokenInfo(GetUserTokenInfoRequest request) throws OperationFailedException,
                                                                                              InvalidTokenException, TException
     {
-        throw new OperationFailedException("Not Implemented Yet!");
+        AuthenticationAssertions.checkRequestNotNull(request);
+        
+        return getUserTokenInfoOperation.process(request);
     }
     
     @Override
@@ -102,7 +146,9 @@ final class AuthenticationServiceImpl implements AuthenticationService.Iface
                                                                                                                            InvalidTokenException,
                                                                                                                            TException
     {
-        throw new OperationFailedException("Not Implemented Yet!");
+        AuthenticationAssertions.checkRequestNotNull(request);
+        
+        return invalidateApplicationTokenOperation.process(request);
     }
     
     @Override
@@ -110,7 +156,9 @@ final class AuthenticationServiceImpl implements AuthenticationService.Iface
                                                                                                       InvalidTokenException,
                                                                                                       TException
     {
-        throw new OperationFailedException("Not Implemented Yet!");
+        AuthenticationAssertions.checkRequestNotNull(request);
+        
+        return invalidateUserTokenOperation.process(request);
     }
     
     @Override
@@ -118,7 +166,9 @@ final class AuthenticationServiceImpl implements AuthenticationService.Iface
                                                                                                                InvalidTokenException,
                                                                                                                TException
     {
-        throw new OperationFailedException("Not Implemented Yet!");
+        AuthenticationAssertions.checkRequestNotNull(request);
+        
+        return verifyApplicationTokenOperation.process(request);
     }
     
     @Override
@@ -126,7 +176,9 @@ final class AuthenticationServiceImpl implements AuthenticationService.Iface
                                                                                           InvalidTokenException,
                                                                                           TException
     {
-        throw new OperationFailedException("Not Implemented Yet!");
+        AuthenticationAssertions.checkRequestNotNull(request);
+        
+        return verifyUserTokenOperation.process(request);
     }
     
 }
