@@ -61,72 +61,72 @@ final class AuthenticationServiceImpl implements AuthenticationService.Iface
     private ThriftOperation<InvalidateUserTokenRequest, InvalidateUserTokenResponse> invalidateUserTokenOperation;
     private ThriftOperation<VerifyApplicationTokenRequest, VerifyApplicationTokenResponse> verifyApplicationTokenOperation;
     private ThriftOperation<VerifyUserTokenRequest, VerifyUserTokenResponse> verifyUserTokenOperation;
-
+    
     @Override
     public double getApiVersion() throws TException
     {
         return AuthenticationServiceConstants.API_VERSION;
     }
-
+    
     @Override
     public CreateApplicationTokenResponse createApplicationToken(CreateApplicationTokenRequest request) throws OperationFailedException,
                                                                                                                TException
     {
-throw new OperationFailedException("Not Implemented Yet!");
+        throw new OperationFailedException("Not Implemented Yet!");
     }
-
+    
     @Override
     public CreateUserTokenResponse createUserToken(CreateUserTokenRequest request) throws OperationFailedException,
                                                                                           TException
     {
-throw new OperationFailedException("Not Implemented Yet!");
+        throw new OperationFailedException("Not Implemented Yet!");
     }
-
+    
     @Override
     public GetApplicationTokenInfoResponse getApplicationTokenInfo(GetApplicationTokenInfoRequest request) throws OperationFailedException,
                                                                                                                   InvalidTokenException,
                                                                                                                   TException
     {
-throw new OperationFailedException("Not Implemented Yet!");
+        throw new OperationFailedException("Not Implemented Yet!");
     }
-
+    
     @Override
     public GetUserTokenInfoResponse getUserTokenInfo(GetUserTokenInfoRequest request) throws OperationFailedException,
                                                                                              InvalidTokenException, TException
     {
-throw new OperationFailedException("Not Implemented Yet!");
+        throw new OperationFailedException("Not Implemented Yet!");
     }
-
+    
     @Override
     public InvalidateApplicationTokenResponse invalidateApplicationToken(InvalidateApplicationTokenRequest request) throws OperationFailedException,
                                                                                                                            InvalidTokenException,
                                                                                                                            TException
     {
-throw new OperationFailedException("Not Implemented Yet!");
+        throw new OperationFailedException("Not Implemented Yet!");
     }
-
+    
     @Override
     public InvalidateUserTokenResponse invalidateUserToken(InvalidateUserTokenRequest request) throws OperationFailedException,
                                                                                                       InvalidTokenException,
                                                                                                       TException
     {
-throw new OperationFailedException("Not Implemented Yet!");
+        throw new OperationFailedException("Not Implemented Yet!");
     }
-
+    
     @Override
     public VerifyApplicationTokenResponse verifyApplicationToken(VerifyApplicationTokenRequest request) throws OperationFailedException,
                                                                                                                InvalidTokenException,
                                                                                                                TException
     {
-throw new OperationFailedException("Not Implemented Yet!");
+        throw new OperationFailedException("Not Implemented Yet!");
     }
-
+    
     @Override
     public VerifyUserTokenResponse verifyUserToken(VerifyUserTokenRequest request) throws OperationFailedException,
-                                                                                          InvalidTokenException, 
+                                                                                          InvalidTokenException,
                                                                                           TException
     {
-throw new OperationFailedException("Not Implemented Yet!");
+        throw new OperationFailedException("Not Implemented Yet!");
     }
-
+    
 }
