@@ -103,12 +103,18 @@
             <artifactId>hamcrest-library</artifactId>
         </dependency>
 
+        <!--CASSANDRA-->
+
         <dependency>
             <groupId>tech.sirwellington.alchemy</groupId>
             <artifactId>alchemy-test</artifactId>
         </dependency>
 
-
+        <dependency>
+            <groupId>com.datastax.cassandra</groupId>
+            <artifactId>cassandra-driver-core</artifactId>
+        </dependency>
+        
     </dependencies>
 
     <build>
