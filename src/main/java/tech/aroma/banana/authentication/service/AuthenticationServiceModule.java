@@ -19,8 +19,10 @@ package tech.aroma.banana.authentication.service;
 
 
 import com.google.inject.AbstractModule;
+import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
 
 /**
  *
@@ -33,6 +35,7 @@ public final class AuthenticationServiceModule extends AbstractModule
     @Override
     protected void configure()
     {
+        bind(AuthenticationService.Iface.class).to(AuthenticationServiceImpl.class).in(Singleton.class);
     }
 
 }
