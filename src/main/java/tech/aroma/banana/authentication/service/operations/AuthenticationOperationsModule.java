@@ -19,9 +19,13 @@ package tech.aroma.banana.authentication.service.operations;
 
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
+import java.time.Duration;
+import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.aroma.banana.thrift.LengthOfTime;
 import tech.aroma.banana.thrift.authentication.service.CreateApplicationTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.CreateApplicationTokenResponse;
 import tech.aroma.banana.thrift.authentication.service.CreateUserTokenRequest;
@@ -38,6 +42,7 @@ import tech.aroma.banana.thrift.authentication.service.VerifyApplicationTokenReq
 import tech.aroma.banana.thrift.authentication.service.VerifyApplicationTokenResponse;
 import tech.aroma.banana.thrift.authentication.service.VerifyUserTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.VerifyUserTokenResponse;
+import tech.aroma.banana.thrift.functions.TimeFunctions;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
 /**
@@ -75,6 +80,12 @@ public final class AuthenticationOperationsModule extends AbstractModule
         bind(new TypeLiteral<ThriftOperation<VerifyUserTokenRequest, VerifyUserTokenResponse>>() {})
             .to(VerifyUserTokenOperation.class);
         
+    }
+    
+    @Provides
+    Function<LengthOfTime, Duration> provideLengthOfTimeConverter()
+    {
+        return TimeFunctions.LENGTH_OF_TIME_TO_DURATION;
     }
     
 }
