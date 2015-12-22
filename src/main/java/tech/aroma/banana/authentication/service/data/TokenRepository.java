@@ -21,7 +21,9 @@ import java.util.List;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.NonNull;
+import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
+import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.INTERFACE;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
@@ -32,6 +34,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
  * 
  * @author SirWellington
  */
+@StrategyPattern(role = INTERFACE)
 public interface TokenRepository 
 {
     boolean tokenExists(@NonEmpty String tokenId) throws IllegalArgumentException;
