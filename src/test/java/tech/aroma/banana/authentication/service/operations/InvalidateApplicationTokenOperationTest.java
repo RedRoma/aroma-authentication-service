@@ -41,15 +41,16 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
  * @author SirWellington
  */
 @RunWith(AlchemyTestRunner.class)
-public class InvalidateApplicationTokenOperationTest 
+public class InvalidateApplicationTokenOperationTest
 {
+
     @Mock
     private TokenRepository repository;
-    
+
     @GeneratePojo
     private InvalidateApplicationTokenRequest request;
     private String tokenId;
-    
+
     private InvalidateApplicationTokenOperation instance;
 
     @Before
@@ -57,10 +58,10 @@ public class InvalidateApplicationTokenOperationTest
     {
         instance = new InvalidateApplicationTokenOperation(repository);
         verifyZeroInteractions(repository);
-        
+
         tokenId = request.token.tokenId;
     }
-    
+
     @Test
     public void testConstructor()
     {
@@ -74,26 +75,44 @@ public class InvalidateApplicationTokenOperationTest
     {
         InvalidateApplicationTokenResponse response = instance.process(request);
         assertThat(response, notNullValue());
-        
+
         verify(repository).deleteToken(tokenId);
     }
-    
+
     @Test
     public void testProcessEdgeCases() throws Exception
     {
         assertThrows(() -> instance.process(null))
             .isInstanceOf(InvalidArgumentException.class);
     }
-    
+
     @Test
     public void testWhenRepositoryFails() throws Exception
     {
         doThrow(new RuntimeException())
             .when(repository)
             .deleteToken(tokenId);
-        
+
         assertThrows(() -> instance.process(request))
             .isInstanceOf(OperationFailedException.class);
+    }
+
+    @Test
+    public void testWithMissingToken() throws Exception
+    {
+        request.token = null;
+
+        assertThrows(() -> instance.process(request))
+            .isInstanceOf(InvalidArgumentException.class);
+    }
+
+    @Test
+    public void testWithMissingTokenId() throws Exception
+    {
+        request.token.tokenId = "";
+
+        assertThrows(() -> instance.process(request))
+            .isInstanceOf(InvalidArgumentException.class);
     }
 
 }
