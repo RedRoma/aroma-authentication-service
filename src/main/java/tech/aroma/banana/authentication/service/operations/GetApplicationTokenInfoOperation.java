@@ -29,8 +29,6 @@ import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 import static tech.aroma.banana.authentication.service.AuthenticationAssertions.checkRequestNotNull;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
-import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
-import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
 
 /**
  *
@@ -50,19 +48,15 @@ final class GetApplicationTokenInfoOperation implements ThriftOperation<GetAppli
         LOG.debug("Received request to get token info: {}", request);
 
         checkRequestNotNull(request);
-        checkRequestNotNull(request.token);
         
-        String tokenId = request.token.token;
-        String applicationId = request.token.applicationId;
+        String tokenId = request.tokenId;
         
-        checkThat(tokenId, applicationId)
+        checkThat(tokenId)
             .throwing(ex -> new InvalidArgumentException("tokenId and applicationid are required"))
             .are(nonEmptyString());
         
-
-        GetApplicationTokenInfoResponse response = one(pojos(GetApplicationTokenInfoResponse.class));
-
-        return response;
+        return new GetApplicationTokenInfoResponse()
+            ;
     }
 
 }
