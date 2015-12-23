@@ -136,7 +136,7 @@ public class TokenRepositoryInMemoryTest
     public void testSaveToken() throws Exception
     {
         repository.saveToken(token);
-        
+
         Token result = repository.getToken(tokenId);
         assertThat(result, is(token));
     }
@@ -182,7 +182,7 @@ public class TokenRepositoryInMemoryTest
         Set<Token> resultSet = Sets.newHashSet(result);
         assertThat(resultSet, is(expected));
     }
-    
+
     @Test
     public void testGetTokensWhenNoneExistForOwner() throws Exception
     {
@@ -191,7 +191,7 @@ public class TokenRepositoryInMemoryTest
         assertThat(result, notNullValue());
         assertThat(result.isEmpty(), is(true));
     }
-    
+
     @Test
     public void testGetTokensBelongingToWithBadArgs() throws Exception
     {
@@ -200,8 +200,26 @@ public class TokenRepositoryInMemoryTest
     }
 
     @Test
-    public void testDeleteToken()
+    public void testDeleteToken() throws Exception
     {
+        repository.saveToken(token);
+        assertThat(repository.doesTokenExist(tokenId), is(true));
+        
+        repository.deleteToken(tokenId);
+        assertThat(repository.doesTokenExist(tokenId), is(false));
+    }
+
+    @Test
+    public void testDeleteTokenWithBadArgs() throws Exception
+    {
+        assertThrows(() -> repository.deleteToken(""))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void testDeleteTokenWhenTokenDoesNotExist() throws Exception
+    {
+        repository.deleteToken(tokenId);
     }
 
 }

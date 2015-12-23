@@ -164,8 +164,14 @@ final class TokenRepositoryInMemory implements TokenRepository
     private void removeToken(String tokenId)
     {
         tokenExpiration.remove(tokenId);
-        
         Token token = tokens.remove(tokenId);
+        
+        //Token never existed
+        if (token == null)
+        {
+            return;
+        }
+        
         String ownerId = token.getOwnerId();
         
         List<Token> tokens = tokensByOwner.get(ownerId);
