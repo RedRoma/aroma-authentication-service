@@ -50,7 +50,7 @@ final class GetApplicationTokenInfoOperation implements ThriftOperation<GetAppli
     GetApplicationTokenInfoOperation(TokenRepository tokenRepository)
     {
         checkThat(tokenRepository).is(notNull());
-        
+
         this.tokenRepository = tokenRepository;
     }
 
@@ -60,32 +60,23 @@ final class GetApplicationTokenInfoOperation implements ThriftOperation<GetAppli
         LOG.debug("Received request to get token info: {}", request);
 
         checkRequestNotNull(request);
-        
+
         String tokenId = request.tokenId;
-        
+
         checkThat(tokenId)
             .throwing(ex -> new InvalidArgumentException("tokenId and applicationid are required"))
             .is(nonEmptyString());
-        
-        Token token = tryGetToken(tokenId);
-        
-        
-        
-        return new GetApplicationTokenInfoResponse()
-            .setToken(token.asApplicationToken())
-            ;
-    }
 
-    @Override
-    public String toString()
-    {
-        return "GetApplicationTokenInfoOperation{" + "tokenRepository=" + tokenRepository + '}';
+        Token token = tryGetToken(tokenId);
+
+        return new GetApplicationTokenInfoResponse()
+            .setToken(token.asApplicationToken());
     }
 
     private Token tryGetToken(String tokenId) throws TException
     {
         Token token;
-        
+
         try
         {
             token = tokenRepository.getToken(tokenId);
@@ -98,13 +89,18 @@ final class GetApplicationTokenInfoOperation implements ThriftOperation<GetAppli
         {
             throw new OperationFailedException("Failed to load token from repository" + ex.getMessage());
         }
-        
+
         checkThat(token)
             .throwing(OperationFailedException.class)
             .is(notNull());
-        
+
         return token;
     }
-    
+
+    @Override
+    public String toString()
+    {
+        return "GetApplicationTokenInfoOperation{" + "tokenRepository=" + tokenRepository + '}';
+    }
 
 }
