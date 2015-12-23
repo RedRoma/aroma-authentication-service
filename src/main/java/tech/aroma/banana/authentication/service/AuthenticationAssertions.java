@@ -27,6 +27,7 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
 import tech.sirwellington.alchemy.annotations.arguments.NonNull;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
+import tech.sirwellington.alchemy.arguments.ExceptionMapper;
 import tech.sirwellington.alchemy.arguments.FailedAssertionException;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
@@ -55,7 +56,7 @@ public final class AuthenticationAssertions
     public static void checkNotNull(Object reference, String message) throws InvalidArgumentException
     {
         checkThat(reference)
-            .throwing(ex -> new InvalidArgumentException(message))
+            .throwing(withMessage(message))
             .is(notNull());
     }
     
@@ -82,6 +83,11 @@ public final class AuthenticationAssertions
                 throw new FailedAssertionException("Token does not exist: " + token);
             }
         };
+    }
+    
+    public static ExceptionMapper<InvalidArgumentException> withMessage(String message)
+    {
+        return ex -> new InvalidArgumentException(message);
     }
 
 }

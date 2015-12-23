@@ -23,11 +23,13 @@ import org.mockito.Mock;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
+import tech.sirwellington.alchemy.arguments.ExceptionMapper;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
@@ -40,7 +42,7 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
  *
  * @author SirWellington
  */
-@Repeat(10)
+@Repeat(50)
 @RunWith(AlchemyTestRunner.class)
 public class AuthenticationAssertionsTest 
 {
@@ -76,7 +78,7 @@ public class AuthenticationAssertionsTest
     }
 
     @Test
-    public void testTokenInRepository()
+    public void testTokenInRepository() throws Exception
     {
         AlchemyAssertion<String> instance = AuthenticationAssertions.tokenInRepository(tokenRepository);
         assertThat(instance, notNullValue());
@@ -100,6 +102,18 @@ public class AuthenticationAssertionsTest
         assertThrows(() -> AuthenticationAssertions.checkNotNull(null, message))
             .isInstanceOf(InvalidArgumentException.class)
             .hasMessage(message);
+    }
+
+    @Test
+    public void testWithMessage()
+    {
+        
+        String message = one(strings());
+        ExceptionMapper<InvalidArgumentException> result = AuthenticationAssertions.withMessage(message);
+        
+        InvalidArgumentException ex = result.apply(null);
+        assertThat(ex, notNullValue());
+        assertThat(ex.getMessage(), is(message));
     }
 
 }
