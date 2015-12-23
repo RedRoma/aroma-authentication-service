@@ -78,4 +78,11 @@ final class GetApplicationTokenInfoOperation implements ThriftOperation<GetAppli
             ;
     }
 
+    @Override
+    public String toString()
+    {
+        return "GetApplicationTokenInfoOperation{" + "tokenRepository=" + tokenRepository + '}';
+    }
+    
+
 }
