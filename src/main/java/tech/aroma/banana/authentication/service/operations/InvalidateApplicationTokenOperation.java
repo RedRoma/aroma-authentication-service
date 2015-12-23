@@ -88,4 +88,10 @@ final class InvalidateApplicationTokenOperation implements ThriftOperation<Inval
         }
     }
 
+    @Override
+    public String toString()
+    {
+        return "InvalidateApplicationTokenOperation{" + "repository=" + repository + '}';
+    }
+    
 }
