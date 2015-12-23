@@ -20,10 +20,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import tech.aroma.banana.authentication.service.data.Token;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.authentication.service.GetUserTokenInfoRequest;
 import tech.aroma.banana.thrift.authentication.service.GetUserTokenInfoResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
+import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
@@ -31,6 +33,7 @@ import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
@@ -41,35 +44,63 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
 @RunWith(AlchemyTestRunner.class)
 public class GetUserTokenInfoOperationTest
 {
-    
+
     @Mock
     private TokenRepository tokenRepository;
 
     @GeneratePojo
     private GetUserTokenInfoRequest request;
-    
+
+    @GeneratePojo
+    private Token token;
+
     private GetUserTokenInfoOperation instance;
-    
+
     @Before
-    public void setUp()
+    public void setUp() throws Exception
     {
         instance = new GetUserTokenInfoOperation(tokenRepository);
-        
+
         verifyZeroInteractions(tokenRepository);
+
+        request.setTokenId(token.getTokenId());
+
+        when(tokenRepository.getToken(request.tokenId))
+            .thenReturn(token);
     }
-    
+
     @Test
     public void testProcess() throws Exception
     {
         GetUserTokenInfoResponse response = instance.process(request);
         assertThat(response, notNullValue());
     }
-    
+
     @Test
     public void testProcessEdgeCases() throws Exception
     {
         assertThrows(() -> instance.process(null))
             .isInstanceOf(InvalidArgumentException.class);
     }
-    
+
+    @Test
+    public void testWhenRepositoryFails() throws Exception
+    {
+        when(tokenRepository.getToken(request.tokenId))
+            .thenThrow(new RuntimeException());
+
+        assertThrows(() -> instance.process(request))
+            .isInstanceOf(OperationFailedException.class);
+
+    }
+
+    @Test
+    public void testWhenRepositoryReturnsNull() throws Exception
+    {
+        when(tokenRepository.getToken(request.tokenId))
+            .thenReturn(null);
+
+        assertThrows(() -> instance.process(request))
+            .isInstanceOf(OperationFailedException.class);
+    }
 }

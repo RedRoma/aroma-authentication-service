@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
- 
 package tech.aroma.banana.authentication.service.operations;
-
 
 import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.aroma.banana.authentication.service.AuthenticationAssertions;
+import tech.aroma.banana.authentication.service.data.Token;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.authentication.service.GetUserTokenInfoRequest;
 import tech.aroma.banana.thrift.authentication.service.GetUserTokenInfoResponse;
+import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
+import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
+import static tech.aroma.banana.authentication.service.AuthenticationAssertions.checkRequestNotNull;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
-import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
-import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
  *
@@ -41,28 +41,32 @@ import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
 @Internal
 final class GetUserTokenInfoOperation implements ThriftOperation<GetUserTokenInfoRequest, GetUserTokenInfoResponse>
 {
+
     private final static Logger LOG = LoggerFactory.getLogger(GetUserTokenInfoOperation.class);
-    
+
     private final TokenRepository tokenRepository;
 
     @Inject
     GetUserTokenInfoOperation(TokenRepository tokenRepository)
     {
         checkThat(tokenRepository).is(notNull());
-        
+
         this.tokenRepository = tokenRepository;
     }
 
     @Override
     public GetUserTokenInfoResponse process(GetUserTokenInfoRequest request) throws TException
     {
-        AuthenticationAssertions.checkRequestNotNull(request);
-        
         LOG.debug("Received request to get token info: {}", request);
-        
-        GetUserTokenInfoResponse response = one(pojos(GetUserTokenInfoResponse.class));
-        
-        return response;
+
+        checkRequestNotNull(request);
+        checkThat(request.tokenId)
+            .throwing(InvalidArgumentException.class)
+            .is(nonEmptyString());
+
+        Token token = tryGetToken(request.tokenId);
+
+        return new GetUserTokenInfoResponse().setToken(token.asUserToken());
     }
 
     @Override
@@ -71,6 +75,28 @@ final class GetUserTokenInfoOperation implements ThriftOperation<GetUserTokenInf
         return "GetUserTokenInfoOperation{" + "tokenRepository=" + tokenRepository + '}';
     }
 
-    
-    
+    private Token tryGetToken(String tokenId) throws TException
+    {
+        Token token;
+        try
+        {
+            token = tokenRepository.getToken(tokenId);
+        }
+        catch (TException ex)
+        {
+            throw ex;
+        }
+        catch (Exception ex)
+        {
+            LOG.error("Failed to retrieve Token from repository", ex);
+            throw new OperationFailedException("Could not retrieve repository");
+        }
+
+        checkThat(token)
+            .throwing(OperationFailedException.class)
+            .is(notNull());
+
+        return token;
+    }
+
 }
