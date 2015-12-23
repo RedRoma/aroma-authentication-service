@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,6 +32,7 @@ import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static java.time.Instant.now;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -115,6 +117,7 @@ public class TokenRepositoryInMemoryTest
         assertThat(result, is(token));
     }
 
+    @DontRepeat
     @Test
     public void testGetTokenWithBadArgs() throws Exception
     {
@@ -141,6 +144,7 @@ public class TokenRepositoryInMemoryTest
         assertThat(result, is(token));
     }
 
+    @DontRepeat
     @Test
     public void testSaveTokenWithBadArgs() throws Exception
     {
@@ -192,6 +196,7 @@ public class TokenRepositoryInMemoryTest
         assertThat(result.isEmpty(), is(true));
     }
 
+    @DontRepeat
     @Test
     public void testGetTokensBelongingToWithBadArgs() throws Exception
     {
@@ -204,11 +209,12 @@ public class TokenRepositoryInMemoryTest
     {
         repository.saveToken(token);
         assertThat(repository.doesTokenExist(tokenId), is(true));
-        
+
         repository.deleteToken(tokenId);
         assertThat(repository.doesTokenExist(tokenId), is(false));
     }
 
+    @DontRepeat
     @Test
     public void testDeleteTokenWithBadArgs() throws Exception
     {
@@ -226,7 +232,7 @@ public class TokenRepositoryInMemoryTest
     public void testDoesTokenBelongTo() throws Exception
     {
         repository.saveToken(token);
-        
+
         boolean result = repository.doesTokenBelongTo(tokenId, ownerId);
         assertThat(result, is(true));
     }
@@ -242,12 +248,13 @@ public class TokenRepositoryInMemoryTest
     public void testDoesTokenBelongToWhenNoMatch() throws Exception
     {
         repository.saveToken(token);
-        
-        String otherOwnerId =  one(hexadecimalString(20));
+
+        String otherOwnerId = one(hexadecimalString(20));
         boolean result = repository.doesTokenBelongTo(tokenId, otherOwnerId);
         assertThat(result, is(false));
     }
 
+    @DontRepeat
     @Test
     public void testDoesTokenBelongToWithBadArgs() throws Exception
     {
@@ -256,7 +263,43 @@ public class TokenRepositoryInMemoryTest
 
         assertThrows(() -> repository.doesTokenBelongTo(tokenId, ""))
             .isInstanceOf(IllegalArgumentException.class);
-        
+
     }
-    
+
+    @Test
+    public void testDeleteTokens() throws Exception
+    {
+        for (Token token : tokens)
+        {
+            repository.saveToken(token);
+        }
+
+        List<String> tokenIds = tokens.stream()
+            .map(Token::getTokenId)
+            .collect(Collectors.toList());
+
+        for (String tokenId : tokenIds)
+        {
+            assertThat(repository.doesTokenExist(tokenId), is(true));
+        }
+
+        repository.deleteTokens(tokenIds);
+
+        for (String tokenId : tokenIds)
+        {
+            assertThat(repository.doesTokenExist(tokenId), is(false));
+        }
+
+        List<Token> tokensBelongingTo = repository.getTokensBelongingTo(ownerId);
+        assertThat(tokensBelongingTo, is(empty()));
+    }
+
+    @DontRepeat
+    @Test
+    public void testDeleteTokensWithBadArgs() throws Exception
+    {
+        assertThrows(() -> repository.deleteTokens(null))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
 }
