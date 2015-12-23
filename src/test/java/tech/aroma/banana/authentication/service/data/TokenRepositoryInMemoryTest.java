@@ -123,7 +123,7 @@ public class TokenRepositoryInMemoryTest
     {
         token.setTimeOfExpiration(now().minusSeconds(5));
         repository.saveToken(token);
-        
+
         assertThrows(() -> repository.getToken(tokenId))
             .isInstanceOf(InvalidTokenException.class);
     }
@@ -131,6 +131,36 @@ public class TokenRepositoryInMemoryTest
     @Test
     public void testSaveToken() throws Exception
     {
+
+        repository.saveToken(token);
+    }
+
+    @Test
+    public void testSaveTokenWithBadArgs() throws Exception
+    {
+        assertThrows(() -> repository.saveToken(null))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        //Missing Owner ID
+        token.setOwnerId("");
+
+        assertThrows(() -> repository.saveToken(token))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        //Missing Token ID
+        token.setOwnerId(ownerId);
+        token.setTokenId("");
+
+        assertThrows(() -> repository.saveToken(token))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        //Missing Token Type
+        token.setTokenId(tokenId);
+        token.setTokenType(null);
+
+        assertThrows(() -> repository.saveToken(token))
+            .isInstanceOf(IllegalArgumentException.class);
+
     }
 
     @Test
