@@ -53,6 +53,13 @@ public final class AuthenticationAssertions
             .is(notNull());
     }
     
+    public static void checkNotNull(Object reference, String message) throws InvalidArgumentException
+    {
+        checkThat(reference)
+            .throwing(ex -> new InvalidArgumentException(message))
+            .is(notNull());
+    }
+    
     public static AlchemyAssertion<String> tokenInRepository(@NonNull TokenRepository repository) throws IllegalArgumentException
     {
         checkThat(repository)

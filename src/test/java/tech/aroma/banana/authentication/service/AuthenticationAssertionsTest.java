@@ -32,6 +32,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.generator.StringGenerators.strings;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
@@ -88,6 +89,17 @@ public class AuthenticationAssertionsTest
             .thenReturn(false);
         assertThrows(() -> instance.check(token));
 
+    }
+
+    @Test
+    public void testCheckNotNull() throws Exception
+    {
+        String message = one(alphabeticString());
+        AuthenticationAssertions.checkNotNull(token, message);
+        
+        assertThrows(() -> AuthenticationAssertions.checkNotNull(null, message))
+            .isInstanceOf(InvalidArgumentException.class)
+            .hasMessage(message);
     }
 
 }
