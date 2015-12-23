@@ -16,45 +16,111 @@
 
 package tech.aroma.banana.authentication.service.operations;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.function.Function;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import tech.aroma.banana.authentication.service.data.Token;
+import tech.aroma.banana.authentication.service.data.TokenCreator;
+import tech.aroma.banana.authentication.service.data.TokenRepository;
+import tech.aroma.banana.thrift.LengthOfTime;
 import tech.aroma.banana.thrift.authentication.service.CreateApplicationTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.CreateApplicationTokenResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
+import tech.aroma.banana.thrift.exceptions.OperationFailedException;
+import tech.aroma.banana.thrift.functions.TimeFunctions;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
+import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
+import static java.time.Instant.now;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.NumberGenerators.longs;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
  *
  * @author SirWellington
  */
-@Repeat(10)
 @RunWith(AlchemyTestRunner.class)
 public class CreateApplicationTokenOperationTest 
 {
 
-    @GeneratePojo
-    private CreateApplicationTokenRequest request;
+    private final Function<LengthOfTime, Duration> lengthOfTimeConverter = TimeFunctions.LENGTH_OF_TIME_TO_DURATION;
     
+    @Mock
+    private TokenCreator tokenCreator;
+    
+    @Mock
+    private TokenRepository tokenRepository;
+
+    private CreateApplicationTokenRequest request;
+
     private CreateApplicationTokenOperation instance;
+    
+    @GenerateString
+    private String tokenId;
+    
+    @GenerateString
+    private String applicationId;
+    
+    @GeneratePojo
+    private LengthOfTime lifetime;
+    
+    @Captor
+    private ArgumentCaptor<Token> tokenCaptor;
     
     @Before
     public void setUp()
     {
-        instance = new CreateApplicationTokenOperation();
+        instance = new CreateApplicationTokenOperation(lengthOfTimeConverter, tokenCreator, tokenRepository);
+        verifyZeroInteractions(tokenCreator, tokenRepository);
+        
+        lifetime.setValue(one(longs(1, 100_000)));
+        
+        
+        request = new CreateApplicationTokenRequest()
+            .setLifetime(lifetime)
+            .setApplicationId(applicationId);
+        
+        when(tokenCreator.create()).thenReturn(tokenId);
     }
 
+    @Repeat(500)
     @Test
     public void testProcess() throws Exception
     {
+        Instant now = now();
+        
         CreateApplicationTokenResponse response = instance.process(request);
         assertThat(response, notNullValue());
+        
+        verify(tokenRepository).saveToken(tokenCaptor.capture());
+        
+        Token savedToken = tokenCaptor.getValue();
+        assertThat(savedToken, notNullValue());
+        assertThat(savedToken.getTokenId(), is(tokenId));
+        assertThat(savedToken.getOwnerId(), is(applicationId));
+        
+        Instant timeOfCreation = savedToken.getTimeOfCreation();
+        Duration timeOfCreationDelta = Duration.between(now, timeOfCreation).abs();
+        assertThat(timeOfCreationDelta.getSeconds(), lessThanOrEqualTo(1L));
+        
+        Instant expectedTimeOfExpiration = now.plus(lengthOfTimeConverter.apply(lifetime));
+        Instant timeOfExpiration = savedToken.getTimeOfExpiration();
+        Duration timeOfExpirationDelta = Duration.between(timeOfExpiration, expectedTimeOfExpiration).abs();
+        assertThat(timeOfExpirationDelta.getSeconds(), lessThan(1L));
     }
     
     @Test
@@ -62,6 +128,16 @@ public class CreateApplicationTokenOperationTest
     {
         assertThrows(() -> instance.process(null))
             .isInstanceOf(InvalidArgumentException.class);
+    }
+    
+    @Test
+    public void testWhenTokenCreatorReturnsEmpty() throws Exception
+    {
+        when(tokenCreator.create())
+            .thenReturn("");
+        
+        assertThrows(() -> instance.process(request))
+            .isInstanceOf(OperationFailedException.class);
     }
 
 }
