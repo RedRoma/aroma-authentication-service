@@ -30,6 +30,7 @@ import static tech.sirwellington.alchemy.generator.StringGenerators.hexadecimalS
  * @author SirWellington
  */
 @Internal
+@FunctionalInterface
 @StrategyPattern(role = INTERFACE)
 public interface TokenCreator
 {
