@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
+import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
 import tech.sirwellington.alchemy.annotations.arguments.NonNull;
@@ -66,7 +67,17 @@ public final class AuthenticationAssertions
         
         return token ->
         {
-            if (!repository.tokenExists(token))
+            boolean exists;
+            try
+            {
+                exists = repository.tokenExists(token);
+            }
+            catch (OperationFailedException ex)
+            {
+                throw new FailedAssertionException("Could not check in repository", ex);
+            }
+            
+            if (!exists)
             {
                 throw new FailedAssertionException("Token does not exist: " + token);
             }
