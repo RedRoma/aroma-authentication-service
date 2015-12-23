@@ -18,15 +18,19 @@
 package tech.aroma.banana.authentication.service.operations;
 
 
+import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.authentication.service.AuthenticationAssertions;
+import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.authentication.service.GetUserTokenInfoRequest;
 import tech.aroma.banana.thrift.authentication.service.GetUserTokenInfoResponse;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
 
@@ -38,6 +42,16 @@ import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
 final class GetUserTokenInfoOperation implements ThriftOperation<GetUserTokenInfoRequest, GetUserTokenInfoResponse>
 {
     private final static Logger LOG = LoggerFactory.getLogger(GetUserTokenInfoOperation.class);
+    
+    private final TokenRepository tokenRepository;
+
+    @Inject
+    GetUserTokenInfoOperation(TokenRepository tokenRepository)
+    {
+        checkThat(tokenRepository).is(notNull());
+        
+        this.tokenRepository = tokenRepository;
+    }
 
     @Override
     public GetUserTokenInfoResponse process(GetUserTokenInfoRequest request) throws TException
@@ -51,4 +65,12 @@ final class GetUserTokenInfoOperation implements ThriftOperation<GetUserTokenInf
         return response;
     }
 
+    @Override
+    public String toString()
+    {
+        return "GetUserTokenInfoOperation{" + "tokenRepository=" + tokenRepository + '}';
+    }
+
+    
+    
 }

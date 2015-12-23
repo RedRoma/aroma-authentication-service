@@ -19,6 +19,8 @@ package tech.aroma.banana.authentication.service.operations;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.authentication.service.GetUserTokenInfoRequest;
 import tech.aroma.banana.thrift.authentication.service.GetUserTokenInfoResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
@@ -28,6 +30,7 @@ import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
@@ -38,6 +41,9 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
 @RunWith(AlchemyTestRunner.class)
 public class GetUserTokenInfoOperationTest
 {
+    
+    @Mock
+    private TokenRepository tokenRepository;
 
     @GeneratePojo
     private GetUserTokenInfoRequest request;
@@ -47,7 +53,9 @@ public class GetUserTokenInfoOperationTest
     @Before
     public void setUp()
     {
-        instance = new GetUserTokenInfoOperation();
+        instance = new GetUserTokenInfoOperation(tokenRepository);
+        
+        verifyZeroInteractions(tokenRepository);
     }
     
     @Test
