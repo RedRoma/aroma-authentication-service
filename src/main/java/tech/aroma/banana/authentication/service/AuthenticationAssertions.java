@@ -18,12 +18,12 @@
 package tech.aroma.banana.authentication.service;
 
 
+import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationToken;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
-import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.access.NonInstantiable;
 import tech.sirwellington.alchemy.annotations.arguments.NonNull;
@@ -72,9 +72,9 @@ public final class AuthenticationAssertions
             boolean exists;
             try
             {
-                exists = repository.tokenExists(token);
+                exists = repository.doesTokenExist(token);
             }
-            catch (OperationFailedException ex)
+            catch (TException ex)
             {
                 throw new FailedAssertionException("Could not check in repository", ex);
             }

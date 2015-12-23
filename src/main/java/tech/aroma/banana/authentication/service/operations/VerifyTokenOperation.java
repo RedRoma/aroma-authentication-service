@@ -16,6 +16,7 @@
 
 package tech.aroma.banana.authentication.service.operations;
 
+import com.google.common.base.Strings;
 import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
@@ -65,6 +66,19 @@ final class VerifyTokenOperation implements ThriftOperation<VerifyTokenRequest, 
             .throwing(withMessage("missing tokenId"))
             .is(nonEmptyString());
         
+        String ownerId = request.ownerId;
+        
+        boolean isTokenGood = false;
+        if (!Strings.isNullOrEmpty(ownerId))
+        {
+            isTokenGood = tryDetermineMatch(tokenId, ownerId);
+        }
+        else
+        {
+            isTokenGood = isInRepository(tokenId);
+        }
+        
+        
         return new VerifyTokenResponse();
 
     }
@@ -75,7 +89,7 @@ final class VerifyTokenOperation implements ThriftOperation<VerifyTokenRequest, 
 
         try
         {
-            match = repository.tokenBelongsTo(tokenId, tokenId);
+            match = repository.doesTokenBelongTo(tokenId, tokenId);
         }
         catch (Exception ex)
         {
@@ -89,6 +103,11 @@ final class VerifyTokenOperation implements ThriftOperation<VerifyTokenRequest, 
     public String toString()
     {
         return "VerifyTokenOperation{" + "repository=" + repository + '}';
+    }
+
+    private boolean isInRepository(String tokenId) throws TException
+    {
+        return repository.doesTokenExist(tokenId);
     }
 
 }

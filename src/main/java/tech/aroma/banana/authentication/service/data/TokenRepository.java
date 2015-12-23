@@ -18,6 +18,7 @@
 package tech.aroma.banana.authentication.service.data;
 
 import java.util.List;
+import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.NonNull;
@@ -26,6 +27,9 @@ import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.INTERFACE;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 
 
 /**
@@ -38,20 +42,20 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
 public interface TokenRepository 
 {
 
-    boolean tokenExists(@NonEmpty String tokenId) throws IllegalArgumentException, OperationFailedException;
+    boolean doesTokenExist(@NonEmpty String tokenId) throws InvalidArgumentException, OperationFailedException;
 
-    boolean tokenBelongsTo(@NonEmpty String tokenId, @NonEmpty String ownerId) throws IllegalArgumentException,
+    boolean doesTokenBelongTo(@NonEmpty String tokenId, @NonEmpty String ownerId) throws InvalidArgumentException,
                                                                                       OperationFailedException;
 
-    Token getToken(@NonEmpty String tokenId) throws IllegalArgumentException, OperationFailedException;
+    Token getToken(@NonEmpty String tokenId) throws InvalidArgumentException, OperationFailedException;
 
-    void saveToken(@NonNull Token token) throws IllegalArgumentException, OperationFailedException;
+    void saveToken(@NonNull Token token) throws InvalidArgumentException, OperationFailedException;
 
-    List<Token> getTokensBelongingTo(String ownerId) throws IllegalArgumentException, OperationFailedException;
+    List<Token> getTokensBelongingTo(String ownerId) throws InvalidArgumentException, OperationFailedException;
 
-    void deleteToken(@NonEmpty String tokenId) throws IllegalArgumentException, OperationFailedException;
+    void deleteToken(@NonEmpty String tokenId) throws InvalidArgumentException, OperationFailedException;
 
-    default void deleteTokens(@NonNull List<String> tokenIds) throws IllegalArgumentException, OperationFailedException
+    default void deleteTokens(@NonNull List<String> tokenIds) throws InvalidArgumentException, OperationFailedException
     {
         checkThat(tokenIds).is(notNull());
 

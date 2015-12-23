@@ -16,6 +16,7 @@
 
 package tech.aroma.banana.authentication.service.operations;
 
+import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,6 +32,7 @@ import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
@@ -46,14 +48,23 @@ public class VerifyTokenOperationTest
 
     @GeneratePojo
     private VerifyTokenRequest request;
-
+    
+    private String tokenId;
+    private String ownerId;
+    
     private VerifyTokenOperation instance;
 
     @Before
-    public void setUp()
+    public void setUp() throws TException
     {
         instance = new VerifyTokenOperation(repository);
         verifyZeroInteractions(repository);
+        
+        tokenId = request.tokenId;
+        ownerId = request.ownerId;
+        
+        when(repository.doesTokenExist(tokenId)).thenReturn(true);
+        when(repository.doesTokenBelongTo(tokenId, ownerId)).thenReturn(true);
     }
 
     @Test

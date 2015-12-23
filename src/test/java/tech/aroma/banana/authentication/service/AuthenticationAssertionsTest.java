@@ -42,6 +42,15 @@ import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.generator.StringGenerators.strings;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
+import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
+import static tech.sirwellington.alchemy.generator.StringGenerators.strings;
+import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
+import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
+import static tech.sirwellington.alchemy.generator.StringGenerators.strings;
+import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
+import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
+import static tech.sirwellington.alchemy.generator.StringGenerators.strings;
 
 /**
  *
@@ -88,11 +97,11 @@ public class AuthenticationAssertionsTest
         AlchemyAssertion<String> instance = AuthenticationAssertions.tokenInRepository(tokenRepository);
         assertThat(instance, notNullValue());
 
-        when(tokenRepository.tokenExists(token))
+        when(tokenRepository.doesTokenExist(token))
             .thenReturn(true);
         instance.check(token);
 
-        when(tokenRepository.tokenExists(token))
+        when(tokenRepository.doesTokenExist(token))
             .thenReturn(false);
         assertThrows(() -> instance.check(token));
 

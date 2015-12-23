@@ -23,15 +23,23 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
 import static java.time.Instant.now;
 import static tech.aroma.banana.authentication.service.AuthenticationAssertions.tokenInRepository;
+import static tech.aroma.banana.authentication.service.AuthenticationAssertions.withMessage;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.CONCRETE_BEHAVIOR;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
+import static java.time.Instant.now;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static java.time.Instant.now;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static java.time.Instant.now;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 
 /**
  *
@@ -48,7 +56,7 @@ final class TokenRepositoryInMemory implements TokenRepository
     private final Map<String, Instant> tokenExpiration = Maps.newConcurrentMap();
 
     @Override
-    public boolean tokenExists(String tokenId) throws IllegalArgumentException
+    public boolean doesTokenExist(String tokenId) throws InvalidArgumentException
     {
 
         if (!tokens.containsKey(tokenId))
@@ -65,7 +73,7 @@ final class TokenRepositoryInMemory implements TokenRepository
     }
 
     @Override
-    public boolean tokenBelongsTo(String tokenId, String ownerId) throws IllegalArgumentException
+    public boolean doesTokenBelongTo(String tokenId, String ownerId) throws InvalidArgumentException
     {
         checkThat(tokenId, ownerId)
             .are(nonEmptyString());
@@ -79,7 +87,7 @@ final class TokenRepositoryInMemory implements TokenRepository
     }
 
     @Override
-    public Token getToken(String tokenId) throws IllegalArgumentException, OperationFailedException
+    public Token getToken(String tokenId) throws InvalidArgumentException, OperationFailedException
     {
         checkThat(tokenId)
             .is(nonEmptyString())
@@ -94,18 +102,20 @@ final class TokenRepositoryInMemory implements TokenRepository
     }
 
     @Override
-    public void saveToken(Token token) throws IllegalArgumentException, OperationFailedException
+    public void saveToken(Token token) throws InvalidArgumentException, OperationFailedException
     {
         checkThat(token).is(notNull());
         
         Instant expiration = token.getTimeOfExpiration();
-        checkThat(expiration).is(notNull());
+        checkThat(expiration)
+            .throwing(withMessage("token is missing an expiration date."))
+            .is(notNull());
         
         String tokenId = token.getTokenId();
         String ownerId = token.getOwnerId();
         
         checkThat(tokenId, ownerId)
-            .usingMessage("tokenId and ownerId must be present in Token")
+            .throwing(withMessage("tokenId and ownerId must be present in Token"))
             .are(nonEmptyString());
             
         tokens.put(tokenId, token);
@@ -116,7 +126,7 @@ final class TokenRepositoryInMemory implements TokenRepository
     }
 
     @Override
-    public List<Token> getTokensBelongingTo(String ownerId) throws IllegalArgumentException, OperationFailedException
+    public List<Token> getTokensBelongingTo(String ownerId) throws InvalidArgumentException, OperationFailedException
     {
         checkThat(ownerId).is(nonEmptyString());
         
@@ -124,7 +134,7 @@ final class TokenRepositoryInMemory implements TokenRepository
     }
 
     @Override
-    public void deleteToken(String tokenId) throws IllegalArgumentException
+    public void deleteToken(String tokenId) throws InvalidArgumentException
     {
         checkThat(tokenId).is(nonEmptyString());
         
