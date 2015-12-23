@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
- 
 package tech.aroma.banana.authentication.service.operations;
-
 
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.aroma.banana.authentication.service.AuthenticationAssertions;
+import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.authentication.service.GetApplicationTokenInfoRequest;
 import tech.aroma.banana.thrift.authentication.service.GetApplicationTokenInfoResponse;
+import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
+import static tech.aroma.banana.authentication.service.AuthenticationAssertions.checkRequestNotNull;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
 
@@ -37,17 +39,29 @@ import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
 @Internal
 final class GetApplicationTokenInfoOperation implements ThriftOperation<GetApplicationTokenInfoRequest, GetApplicationTokenInfoResponse>
 {
+
     private final static Logger LOG = LoggerFactory.getLogger(GetApplicationTokenInfoOperation.class);
+
+    private TokenRepository tokenRepository;
 
     @Override
     public GetApplicationTokenInfoResponse process(GetApplicationTokenInfoRequest request) throws TException
     {
-        AuthenticationAssertions.checkRequestNotNull(request);
-        
         LOG.debug("Received request to get token info: {}", request);
+
+        checkRequestNotNull(request);
+        checkRequestNotNull(request.token);
         
+        String tokenId = request.token.token;
+        String applicationId = request.token.applicationId;
+        
+        checkThat(tokenId, applicationId)
+            .throwing(ex -> new InvalidArgumentException("tokenId and applicationid are required"))
+            .are(nonEmptyString());
+        
+
         GetApplicationTokenInfoResponse response = one(pojos(GetApplicationTokenInfoResponse.class));
-        
+
         return response;
     }
 
