@@ -22,6 +22,10 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.authentication.service.AuthenticationAssertions;
+import tech.aroma.banana.authentication.service.data.TokenCreator;
+import tech.aroma.banana.authentication.service.data.TokenRepository;
+import tech.aroma.banana.thrift.LengthOfTime;
+import tech.aroma.banana.thrift.TimeUnit;
 import tech.aroma.banana.thrift.authentication.service.CreateApplicationTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.CreateApplicationTokenResponse;
 import tech.sirwellington.alchemy.annotations.access.Internal;
@@ -37,6 +41,10 @@ import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
 final class CreateApplicationTokenOperation implements ThriftOperation<CreateApplicationTokenRequest, CreateApplicationTokenResponse>
 {
     private final static Logger LOG = LoggerFactory.getLogger(CreateApplicationTokenOperation.class);
+    private final static LengthOfTime DEFAULT_LIFETIME = new LengthOfTime(TimeUnit.DAYS, 30);
+
+    private TokenCreator tokenCreator;
+    private TokenRepository tokenRepository;
 
     @Override
     public CreateApplicationTokenResponse process(CreateApplicationTokenRequest request) throws TException
@@ -44,6 +52,11 @@ final class CreateApplicationTokenOperation implements ThriftOperation<CreateApp
         AuthenticationAssertions.checkRequestNotNull(request);
         
         LOG.debug("Received request to create an Application Token: {}", request);
+        
+        //Check the request
+        //Create the token
+        //Store the token
+        //Return the token
         
         CreateApplicationTokenResponse response = pojos(CreateApplicationTokenResponse.class).get();
         

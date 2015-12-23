@@ -28,6 +28,7 @@ import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.aroma.banana.authentication.service.data.AuthenticationDataModule;
 import tech.aroma.banana.authentication.service.operations.AuthenticationOperationsModule;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationServiceConstants;
@@ -49,7 +50,8 @@ public final class TcpServer
 
     public static void main(String[] args) throws TTransportException, SocketException
     {
-        Injector injector = Guice.createInjector(new AuthenticationOperationsModule(),
+        Injector injector = Guice.createInjector(new AuthenticationDataModule(),
+                                                 new AuthenticationOperationsModule(),
                                                  new AuthenticationServiceModule());
 
         AuthenticationService.Iface bananaService = injector.getInstance(AuthenticationService.Iface.class);

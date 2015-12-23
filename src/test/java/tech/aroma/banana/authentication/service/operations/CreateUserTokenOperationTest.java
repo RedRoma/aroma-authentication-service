@@ -16,29 +16,66 @@
 
 package tech.aroma.banana.authentication.service.operations;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.function.Function;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import tech.aroma.banana.authentication.service.data.Token;
+import tech.aroma.banana.authentication.service.data.TokenCreator;
+import tech.aroma.banana.authentication.service.data.TokenRepository;
+import tech.aroma.banana.thrift.LengthOfTime;
 import tech.aroma.banana.thrift.authentication.service.CreateUserTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.CreateUserTokenResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
+import tech.aroma.banana.thrift.exceptions.OperationFailedException;
+import tech.aroma.banana.thrift.functions.TimeFunctions;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
+import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
+import static java.time.Instant.now;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.NumberGenerators.longs;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
  *
  * @author SirWellington
  */
-@Repeat(10)
 @RunWith(AlchemyTestRunner.class)
 public class CreateUserTokenOperationTest 
 {
 
+    @Mock
+    private TokenCreator tokenCreator;
+    
+    @Mock
+    private TokenRepository tokenRepository;
+    
+    private Function<LengthOfTime, Duration> lengthOfTimeConverter = TimeFunctions.LENGTH_OF_TIME_TO_DURATION;
+    
+    @GenerateString
+    private String tokenId;
+    
+    @GenerateString
+    private String userId;
+    
+    @Captor
+    private ArgumentCaptor<Token> tokenCaptor;
+    
     @GeneratePojo
     private CreateUserTokenRequest request;
     
@@ -47,21 +84,66 @@ public class CreateUserTokenOperationTest
     @Before
     public void setUp()
     {
-        instance = new CreateUserTokenOperation();
+        instance = new CreateUserTokenOperation(tokenCreator, tokenRepository, lengthOfTimeConverter);
+        verifyZeroInteractions(tokenCreator, tokenRepository);
+        
+        when(tokenCreator.create()).thenReturn(tokenId);
+        
+        request.setUserId(userId)
+            .getLifetime()
+            .setValue(one(longs(1, 1000000)));
     }
 
+    @Repeat(500)
     @Test
     public void testProcess() throws Exception
     {
+        Instant now = now();
+        
         CreateUserTokenResponse response = instance.process(request);
         assertThat(response, notNullValue());
+
+        verify(tokenRepository).saveToken(tokenCaptor.capture());
+        Token token = tokenCaptor.getValue();
+        assertThat(token, notNullValue());
+        assertThat(token.getOwnerId(), is(userId));
+        assertThat(token.getTokenId(), is(tokenId));
+        
+        Duration timeOfCreationDelta = Duration.between(now, token.getTimeOfCreation()).abs();
+        assertThat(timeOfCreationDelta.getSeconds(), is(lessThanOrEqualTo(1L)));
+        
+        Duration tokenLifetime = lengthOfTimeConverter.apply(request.lifetime);
+        Instant expectedExpiration = now.plus(tokenLifetime);
+        
+        Duration timeOfExpirationDelta = Duration.between(token.getTimeOfExpiration(), expectedExpiration);
+        assertThat(timeOfExpirationDelta.getSeconds(), is(lessThanOrEqualTo(1L)));
     }
-    
+
     @Test
     public void testProcessEdgeCases()
     {
         assertThrows(() -> instance.process(null))
             .isInstanceOf(InvalidArgumentException.class);
     }
+    
+    @Test
+    public void testWhenTokenCreatorReturnsNull()
+    {
+        when(tokenCreator.create())
+            .thenReturn("");
+        
+        assertThrows(() -> instance.process(request))
+            .isInstanceOf(OperationFailedException.class);
+    }
 
+    @Test
+    public void testWhenRepositoryFails() throws Exception
+    {
+        doThrow(new OperationFailedException())
+            .when(tokenRepository)
+            .saveToken(Mockito.any());
+        
+        assertThrows(() -> instance.process(request))
+            .isInstanceOf(OperationFailedException.class);
+    }
 }

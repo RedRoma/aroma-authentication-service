@@ -21,6 +21,7 @@ import com.google.inject.Injector;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import tech.aroma.banana.authentication.service.data.AuthenticationDataModule;
 import tech.aroma.banana.authentication.service.operations.AuthenticationOperationsModule;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
@@ -35,6 +36,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(AlchemyTestRunner.class)
 public class AuthenticationServiceModuleTest
 {
+    private AuthenticationDataModule dataModule;
 
     private AuthenticationOperationsModule operationsModule;
 
@@ -43,6 +45,7 @@ public class AuthenticationServiceModuleTest
     @Before
     public void setUp()
     {
+        dataModule = new AuthenticationDataModule();
         operationsModule = new AuthenticationOperationsModule();
         module = new AuthenticationServiceModule();
     }
@@ -50,7 +53,10 @@ public class AuthenticationServiceModuleTest
     @Test
     public void testConfigure()
     {
-        Injector injector = Guice.createInjector(operationsModule, module);
+        Injector injector = Guice.createInjector(dataModule, 
+                                                 operationsModule, 
+                                                 module);
+        
         AuthenticationService.Iface service = injector.getInstance(AuthenticationService.Iface.class);
         assertThat(service, notNullValue());
     }
