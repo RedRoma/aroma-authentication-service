@@ -21,9 +21,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
+import tech.aroma.banana.thrift.authentication.ApplicationToken;
+import tech.aroma.banana.thrift.authentication.UserToken;
+import tech.aroma.banana.thrift.authentication.service.AuthenticationToken;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import tech.sirwellington.alchemy.arguments.ExceptionMapper;
+import tech.sirwellington.alchemy.arguments.FailedAssertionException;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
@@ -34,6 +38,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.generator.StringGenerators.strings;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
@@ -114,6 +119,27 @@ public class AuthenticationAssertionsTest
         InvalidArgumentException ex = result.apply(null);
         assertThat(ex, notNullValue());
         assertThat(ex.getMessage(), is(message));
+    }
+
+    @Test
+    public void testLegalToken()
+    {
+        AlchemyAssertion<AuthenticationToken> instance = AuthenticationAssertions.legalToken();
+        assertThat(instance, notNullValue());
+
+        AuthenticationToken authenticationToken = new AuthenticationToken();
+
+        assertThrows(() -> instance.check(authenticationToken))
+            .isInstanceOf(FailedAssertionException.class);
+
+        ApplicationToken applicationToken = one(pojos(ApplicationToken.class));
+        authenticationToken.setApplicationToken(applicationToken);
+        instance.check(authenticationToken);
+        
+        UserToken userToken = one(pojos(UserToken.class));
+        authenticationToken.setUserToken(userToken);
+        instance.check(authenticationToken);
+        
     }
 
 }

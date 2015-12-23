@@ -21,6 +21,7 @@ package tech.aroma.banana.authentication.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
+import tech.aroma.banana.thrift.authentication.service.AuthenticationToken;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
@@ -81,6 +82,19 @@ public final class AuthenticationAssertions
             if (!exists)
             {
                 throw new FailedAssertionException("Token does not exist: " + token);
+            }
+        };
+    }
+    
+    public static AlchemyAssertion<AuthenticationToken> legalToken()
+    {
+        return t ->
+        {
+            checkThat(t).is(notNull());
+            
+            if (!t.isSet())
+            {
+                throw new FailedAssertionException("Token Has not been set:  " + t);
             }
         };
     }
