@@ -37,26 +37,28 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
 @StrategyPattern(role = INTERFACE)
 public interface TokenRepository 
 {
-    boolean tokenExists(@NonEmpty String tokenId) throws IllegalArgumentException;
-    
-    boolean tokenBelongsTo(@NonEmpty String tokenId, @NonEmpty String ownerId) throws IllegalArgumentException;
-    
+
+    boolean tokenExists(@NonEmpty String tokenId) throws IllegalArgumentException, OperationFailedException;
+
+    boolean tokenBelongsTo(@NonEmpty String tokenId, @NonEmpty String ownerId) throws IllegalArgumentException,
+                                                                                      OperationFailedException;
+
     Token getToken(@NonEmpty String tokenId) throws IllegalArgumentException, OperationFailedException;
-    
+
     void saveToken(@NonNull Token token) throws IllegalArgumentException, OperationFailedException;
-    
+
     List<Token> getTokensBelongingTo(String ownerId) throws IllegalArgumentException, OperationFailedException;
-    
-    void deleteToken(@NonEmpty String tokenId) throws IllegalArgumentException;
-    
-    default void deleteTokens(@NonNull List<String> tokenIds) throws IllegalArgumentException
+
+    void deleteToken(@NonEmpty String tokenId) throws IllegalArgumentException, OperationFailedException;
+
+    default void deleteTokens(@NonNull List<String> tokenIds) throws IllegalArgumentException, OperationFailedException
     {
         checkThat(tokenIds).is(notNull());
-        
+
         for (String token : tokenIds)
         {
             deleteToken(token);
         }
     }
-    
+
 }
