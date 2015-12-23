@@ -24,6 +24,7 @@ import org.junit.runner.RunWith;
 import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
 import tech.sirwellington.alchemy.generator.AlchemyGenerator;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
+import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
@@ -40,7 +41,7 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
  *
  * @author SirWellington
  */
-@Repeat(10)
+@Repeat(100)
 @RunWith(AlchemyTestRunner.class)
 public class TokenRepositoryInMemoryTest
 {
@@ -59,14 +60,14 @@ public class TokenRepositoryInMemoryTest
     public void setUp()
     {
         repository = new TokenRepositoryInMemory();
-        
+
         tokenId = token.getTokenId();
         ownerId = token.getOwnerId();
 
         AlchemyGenerator<Token> tokenGenerator = pojos(Token.class);
         tokens = listOf(tokenGenerator, 10);
         tokens.forEach(t -> t.setOwnerId(ownerId));
-        
+
         Instant timeOfExpiration = one(futureInstants());
         token.setTimeOfExpiration(timeOfExpiration);
         tokens.forEach(t -> t.setTimeOfExpiration(timeOfExpiration));
@@ -79,17 +80,22 @@ public class TokenRepositoryInMemoryTest
 
         repository.saveToken(token);
         assertThat(repository.doesTokenExist(tokenId), is(true));
-        
+    }
+
+    @DontRepeat
+    @Test
+    public void testDoesTokenExistWithBadArgs() throws Exception
+    {
         assertThrows(() -> repository.doesTokenExist(""))
             .isInstanceOf(IllegalArgumentException.class);
     }
-    
+
     @Test
     public void testDoesTokenExistWhenTokenExpired() throws Exception
     {
         token.setTimeOfExpiration(now().minusSeconds(3));
         repository.saveToken(token);
-        
+
         assertThat(repository.doesTokenExist(tokenId), is(false));
     }
 
@@ -98,18 +104,26 @@ public class TokenRepositoryInMemoryTest
     {
         assertThrows(() -> repository.getToken(tokenId))
             .isInstanceOf(InvalidTokenException.class);
-        
+
         repository.saveToken(token);
-        
+
         Token result = repository.getToken(tokenId);
         assertThat(result, is(token));
     }
-    
+
+    @Test
+    public void testGetTokenWithBadArgs() throws Exception
+    {
+        assertThrows(() -> repository.getToken(""))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
     @Test
     public void testGetTokenWhenTokenExpired() throws Exception
     {
         token.setTimeOfExpiration(now().minusSeconds(5));
         repository.saveToken(token);
+        
         assertThrows(() -> repository.getToken(tokenId))
             .isInstanceOf(InvalidTokenException.class);
     }
