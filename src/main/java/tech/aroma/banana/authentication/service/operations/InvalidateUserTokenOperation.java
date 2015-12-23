@@ -60,13 +60,13 @@ final class InvalidateUserTokenOperation implements ThriftOperation<InvalidateUs
         LOG.debug("Received request to invalidate token: {}", request);
         checkRequestNotNull(request);
         checkNotNull(request.token, "missing token");
-        
+
         String tokenId = request.token.tokenId;
         checkThat(tokenId)
             .throwing(ex -> new InvalidArgumentException("missing tokenId"))
             .is(nonEmptyString());
         tryDelete(tokenId);
-        
+
         return new InvalidateUserTokenResponse();
     }
 
@@ -85,6 +85,12 @@ final class InvalidateUserTokenOperation implements ThriftOperation<InvalidateUs
             throw new OperationFailedException("Failed to delete token from repository: " + ex.getMessage());
         }
 
+    }
+
+    @Override
+    public String toString()
+    {
+        return "InvalidateUserTokenOperation{" + "repository=" + repository + '}';
     }
 
 }
