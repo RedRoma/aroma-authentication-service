@@ -30,13 +30,13 @@ import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
  *
  * @author SirWellington
  */
-@Repeat(10)
 @RunWith(AlchemyTestRunner.class)
 public class VerifyTokenOperationTest
 {
@@ -53,6 +53,7 @@ public class VerifyTokenOperationTest
     public void setUp()
     {
         instance = new VerifyTokenOperation(repository);
+        verifyZeroInteractions(repository);
     }
 
     @Test
@@ -62,6 +63,7 @@ public class VerifyTokenOperationTest
             .isInstanceOf(IllegalArgumentException.class);
     }
     
+    @Repeat(100)
     @Test
     public void testProcess() throws Exception
     {
