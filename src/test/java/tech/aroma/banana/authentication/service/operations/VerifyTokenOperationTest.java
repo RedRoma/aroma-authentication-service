@@ -21,16 +21,22 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.authentication.service.VerifyTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.VerifyTokenResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
+import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
+import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
@@ -81,12 +87,70 @@ public class VerifyTokenOperationTest
         VerifyTokenResponse response = instance.process(request);
         assertThat(response, notNullValue());
     }
+    
+    @Repeat
+    @Test
+    public void testWhenNoOwnerInRequest() throws Exception
+    {
+        request.unsetOwnerId();
+        
+        VerifyTokenResponse response = instance.process(request);
+        assertThat(response, notNullValue());
+        
+        verify(repository).doesTokenExist(tokenId);
+        verify(repository, never()).doesTokenBelongTo(eq(tokenId), Mockito.any());
+    }
+    
+    @Repeat
+    @Test
+    public void testWhenTokenOwnerMismatch() throws Exception
+    {
+        when(repository.doesTokenBelongTo(tokenId, ownerId))
+            .thenReturn(false);
+        
+        assertThrows(() -> instance.process(request))
+            .isInstanceOf(InvalidTokenException.class);
+    }
+    
+    @Repeat(100)
+    @Test
+    public void testWhenTokenDoesNotExist() throws Exception
+    {
+        when(repository.doesTokenExist(tokenId))
+            .thenReturn(false);
+
+        request.unsetOwnerId();
+
+        assertThrows(() -> instance.process(request))
+            .isInstanceOf(InvalidTokenException.class);
+    }
+    
+    @Repeat
+    @Test
+    public void testWhenRepositoryFails() throws Exception
+    {
+        when(repository.doesTokenBelongTo(tokenId, ownerId))
+            .thenThrow(new RuntimeException());
+            
+        assertThrows(() -> instance.process(request))
+            .isInstanceOf(OperationFailedException.class);
+    }
 
     @Test
-    public void testProcessEdgeCases() throws Exception
+    public void testWithBadRequests() throws Exception
     {
         assertThrows(() -> instance.process(null))
             .isInstanceOf(InvalidArgumentException.class);
+        
+        VerifyTokenRequest badRequest = new VerifyTokenRequest();
+        
+        assertThrows(() -> instance.process(badRequest))
+            .isInstanceOf(InvalidArgumentException.class);
+        
+        badRequest.ownerId = ownerId;
+        assertThrows(() -> instance.process(badRequest))
+            .isInstanceOf(InvalidArgumentException.class);
+        
     }
 
 }

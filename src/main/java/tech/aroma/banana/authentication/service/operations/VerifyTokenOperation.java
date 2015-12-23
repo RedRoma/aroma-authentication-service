@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.authentication.service.VerifyTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.VerifyTokenResponse;
+import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
@@ -78,22 +79,26 @@ final class VerifyTokenOperation implements ThriftOperation<VerifyTokenRequest, 
             isTokenGood = isInRepository(tokenId);
         }
         
+        if (!isTokenGood)
+        {
+            throw new InvalidTokenException();
+        }
         
         return new VerifyTokenResponse();
 
     }
 
-    private boolean tryDetermineMatch(String tokenId, String Id) throws OperationFailedException
+    private boolean tryDetermineMatch(String tokenId, String ownerId) throws OperationFailedException
     {
         boolean match;
 
         try
         {
-            match = repository.doesTokenBelongTo(tokenId, tokenId);
+            match = repository.doesTokenBelongTo(tokenId, ownerId);
         }
         catch (Exception ex)
         {
-            throw new OperationFailedException("Could not read repository");
+            throw new OperationFailedException("Could not read token repository");
         }
 
         return match;
@@ -107,7 +112,18 @@ final class VerifyTokenOperation implements ThriftOperation<VerifyTokenRequest, 
 
     private boolean isInRepository(String tokenId) throws TException
     {
-        return repository.doesTokenExist(tokenId);
+        try
+        {
+            return repository.doesTokenExist(tokenId);
+        }
+        catch (TException ex)
+        {
+            throw ex;
+        }
+        catch (Exception ex)
+        {
+            throw new OperationFailedException("Could not read token repository");
+        }
     }
 
 }
