@@ -222,4 +222,41 @@ public class TokenRepositoryInMemoryTest
         repository.deleteToken(tokenId);
     }
 
+    @Test
+    public void testDoesTokenBelongTo() throws Exception
+    {
+        repository.saveToken(token);
+        
+        boolean result = repository.doesTokenBelongTo(tokenId, ownerId);
+        assertThat(result, is(true));
+    }
+
+    @Test
+    public void testDoesTokenBelongToWhenTokenDoesNotExist() throws Exception
+    {
+        assertThrows(() -> repository.doesTokenBelongTo(tokenId, ownerId))
+            .isInstanceOf(InvalidTokenException.class);
+    }
+
+    @Test
+    public void testDoesTokenBelongToWhenNoMatch() throws Exception
+    {
+        repository.saveToken(token);
+        
+        String otherOwnerId =  one(hexadecimalString(20));
+        boolean result = repository.doesTokenBelongTo(tokenId, otherOwnerId);
+        assertThat(result, is(false));
+    }
+
+    @Test
+    public void testDoesTokenBelongToWithBadArgs() throws Exception
+    {
+        assertThrows(() -> repository.doesTokenBelongTo("", ownerId))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        assertThrows(() -> repository.doesTokenBelongTo(tokenId, ""))
+            .isInstanceOf(IllegalArgumentException.class);
+        
+    }
+    
 }
