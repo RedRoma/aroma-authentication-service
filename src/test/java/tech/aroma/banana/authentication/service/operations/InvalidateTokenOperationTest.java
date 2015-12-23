@@ -21,8 +21,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
-import tech.aroma.banana.thrift.authentication.ApplicationToken;
-import tech.aroma.banana.thrift.authentication.UserToken;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationToken;
 import tech.aroma.banana.thrift.authentication.service.InvalidateTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.InvalidateTokenResponse;
@@ -38,8 +36,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static tech.aroma.banana.authentication.service.TokenGenerators.authenticationTokens;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
-import static tech.sirwellington.alchemy.generator.BooleanGenerators.booleans;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
@@ -56,13 +54,8 @@ public class InvalidateTokenOperationTest
     @GeneratePojo
     private InvalidateTokenRequest request;
     
-    @GeneratePojo
-    private ApplicationToken applicationToken;
     
     private AuthenticationToken authenticationToken;
-    
-    @GeneratePojo
-    private UserToken userToken;
     
     private String tokenId;
 
@@ -74,22 +67,10 @@ public class InvalidateTokenOperationTest
         instance = new InvalidateTokenOperation(repository);
         verifyZeroInteractions(repository);
 
-        authenticationToken = new AuthenticationToken();
-
-        boolean heads = one(booleans());
-
-        if (heads)
-        {
-            authenticationToken.setApplicationToken(applicationToken);
-        }
-        else
-        {
-            authenticationToken.setUserToken(userToken);
-        }
-
+        authenticationToken = one(authenticationTokens());
+        tokenId = TokenFunctions.extractTokenId(authenticationToken);
+        
         request.setToken(authenticationToken);
-
-        tokenId = TokenFunctions.extractTokenId(request.token);
     }
 
     @Test
