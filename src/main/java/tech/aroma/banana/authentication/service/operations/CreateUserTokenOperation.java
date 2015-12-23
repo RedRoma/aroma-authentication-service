@@ -122,9 +122,7 @@ final class CreateUserTokenOperation implements ThriftOperation<CreateUserTokenR
 
     private UserToken toUserToken(Token token)
     {
-        return new UserToken()
-            .setToken(token.getTokenId())
-            .setTimeOfExpiration(token.getTimeOfExpiration().toEpochMilli());
+        return token.asUserToken();
     }
 
     @Override

@@ -19,42 +19,60 @@ package tech.aroma.banana.authentication.service.operations;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import tech.aroma.banana.authentication.service.data.Token;
+import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.authentication.service.GetApplicationTokenInfoRequest;
 import tech.aroma.banana.thrift.authentication.service.GetApplicationTokenInfoResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
+import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
  *
  * @author SirWellington
  */
-@Repeat(10)
 @RunWith(AlchemyTestRunner.class)
 public class GetApplicationTokenInfoOperationTest
 {
-
+    @Mock
+    private TokenRepository tokenRepository;
+    
     @GeneratePojo
     private GetApplicationTokenInfoRequest request;
+    
+    @GeneratePojo
+    private Token token;
     
     private GetApplicationTokenInfoOperation instance;
     
     @Before
-    public void setUp()
+    public void setUp() throws Exception
     {
-        instance = new GetApplicationTokenInfoOperation();
+        instance = new GetApplicationTokenInfoOperation(tokenRepository);
+        verifyZeroInteractions(tokenRepository);
+        
+        when(tokenRepository.getToken(token.getTokenId()))
+            .thenReturn(token);
+        
+        request.setTokenId(token.getTokenId());
     }
     
+    @Repeat(100)
     @Test
     public void testProcess() throws Exception
     {
         GetApplicationTokenInfoResponse response = instance.process(request);
         assertThat(response, notNullValue());
+        assertThat(response.token, is(token.asApplicationToken()));
     }
     
     @Test
@@ -64,4 +82,14 @@ public class GetApplicationTokenInfoOperationTest
             .isInstanceOf(InvalidArgumentException.class);
     }
     
+    @Test
+    public void testWhenRepositoryFails() throws Exception
+    {
+        when(tokenRepository.getToken(request.tokenId))
+            .thenThrow(new OperationFailedException());
+        
+        assertThrows(() -> instance.process(request))
+            .isInstanceOf(OperationFailedException.class);
+            
+    }
 }

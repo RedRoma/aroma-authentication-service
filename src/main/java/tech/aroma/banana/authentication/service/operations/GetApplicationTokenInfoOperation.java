@@ -16,18 +16,22 @@
 
 package tech.aroma.banana.authentication.service.operations;
 
+import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.aroma.banana.authentication.service.data.Token;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.authentication.service.GetApplicationTokenInfoRequest;
 import tech.aroma.banana.thrift.authentication.service.GetApplicationTokenInfoResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
+import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
 import static tech.aroma.banana.authentication.service.AuthenticationAssertions.checkRequestNotNull;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
@@ -40,7 +44,15 @@ final class GetApplicationTokenInfoOperation implements ThriftOperation<GetAppli
 
     private final static Logger LOG = LoggerFactory.getLogger(GetApplicationTokenInfoOperation.class);
 
-    private TokenRepository tokenRepository;
+    private final TokenRepository tokenRepository;
+
+    @Inject
+    GetApplicationTokenInfoOperation(TokenRepository tokenRepository)
+    {
+        checkThat(tokenRepository).is(notNull());
+        
+        this.tokenRepository = tokenRepository;
+    }
 
     @Override
     public GetApplicationTokenInfoResponse process(GetApplicationTokenInfoRequest request) throws TException
@@ -53,9 +65,16 @@ final class GetApplicationTokenInfoOperation implements ThriftOperation<GetAppli
         
         checkThat(tokenId)
             .throwing(ex -> new InvalidArgumentException("tokenId and applicationid are required"))
-            .are(nonEmptyString());
+            .is(nonEmptyString());
+        
+        Token token = tokenRepository.getToken(tokenId);
+        
+        checkThat(token)
+            .throwing(InvalidTokenException.class)
+            .is(notNull());
         
         return new GetApplicationTokenInfoResponse()
+            .setToken(token.asApplicationToken())
             ;
     }
 

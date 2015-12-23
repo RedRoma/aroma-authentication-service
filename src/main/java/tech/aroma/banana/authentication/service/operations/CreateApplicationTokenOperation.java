@@ -115,10 +115,7 @@ final class CreateApplicationTokenOperation implements ThriftOperation<CreateApp
     
     private ApplicationToken toApplicationToken(Token token)
     {
-        return new ApplicationToken()
-            .setToken(token.getTokenId())
-            .setTimeOfExpiration(token.getTimeOfExpiration().toEpochMilli())
-            .setApplicationId(token.getOwnerId());
+        return token.asApplicationToken();
     }
 
     @Override
