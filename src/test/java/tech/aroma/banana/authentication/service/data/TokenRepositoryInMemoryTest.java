@@ -131,8 +131,10 @@ public class TokenRepositoryInMemoryTest
     @Test
     public void testSaveToken() throws Exception
     {
-
         repository.saveToken(token);
+        
+        Token result = repository.getToken(tokenId);
+        assertThat(result, is(token));
     }
 
     @Test
