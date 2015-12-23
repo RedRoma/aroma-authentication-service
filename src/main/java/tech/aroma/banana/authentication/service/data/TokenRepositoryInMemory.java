@@ -21,8 +21,10 @@ import com.google.common.collect.Maps;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
 import static java.time.Instant.now;
@@ -66,10 +68,11 @@ final class TokenRepositoryInMemory implements TokenRepository
 
 
     @Override
-    public Token getToken(String tokenId) throws IllegalArgumentException
+    public Token getToken(String tokenId) throws TException
     {
         checkThat(tokenId)
             .is(nonEmptyString())
+            .throwing(InvalidTokenException.class)
             .is(tokenInRepository(this));
 
         if (isExpired(tokenId))
@@ -81,7 +84,7 @@ final class TokenRepositoryInMemory implements TokenRepository
     }
 
     @Override
-    public void saveToken(Token token) throws IllegalArgumentException
+    public void saveToken(Token token) throws TException
     {
         checkThat(token)
             .usingMessage("token is null")
@@ -111,7 +114,23 @@ final class TokenRepositoryInMemory implements TokenRepository
     {
         checkThat(ownerId).is(nonEmptyString());
         
-        return tokensByOwner.getOrDefault(ownerId, Lists.newArrayList());
+        List<Token> allTokens = tokensByOwner.getOrDefault(ownerId, Lists.newArrayList());
+        
+        //Sending a separate list ensures we send a defensive copy.
+        List<Token> results = Lists.newArrayList();
+        
+        for (Token token : allTokens)
+        {
+            String tokenId = token.getTokenId();
+            if (isExpired(tokenId))
+            {
+                removeToken(tokenId);
+                continue;
+            }
+            results.add(token);
+        }
+        
+        return results;
     }
 
     @Override

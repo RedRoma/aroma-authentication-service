@@ -18,6 +18,8 @@
 package tech.aroma.banana.authentication.service.data;
 
 import java.util.List;
+import org.apache.thrift.TException;
+import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.NonNull;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
@@ -39,16 +41,16 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
 public interface TokenRepository 
 {
 
-    boolean doesTokenExist(@NonEmpty String tokenId) throws IllegalArgumentException;
+    boolean doesTokenExist(@NonEmpty String tokenId) throws TException;
 
-    default boolean doesTokenBelongTo(@NonEmpty String tokenId, @NonEmpty String ownerId) throws IllegalArgumentException
+    default boolean doesTokenBelongTo(@NonEmpty String tokenId, @NonEmpty String ownerId) throws InvalidTokenException, TException
     {
         checkThat(tokenId, ownerId)
             .usingMessage("tokenId and ownerId are required")
             .are(nonEmptyString());
 
         checkThat(tokenId)
-            .usingMessage("Token does not exist in this repository")
+            .throwing(ex -> new InvalidTokenException("tokenId does not exist in this repository"))
             .is(tokenInRepository(this));
 
         Token token = this.getToken(tokenId);
@@ -56,15 +58,15 @@ public interface TokenRepository
         return ownerId.equals(token.getOwnerId());
     }
 
-    Token getToken(@NonEmpty String tokenId) throws IllegalArgumentException;
+    Token getToken(@NonEmpty String tokenId) throws TException, InvalidTokenException;
 
-    void saveToken(@NonNull Token token) throws IllegalArgumentException;
+    void saveToken(@NonNull Token token) throws TException;
 
-    List<Token> getTokensBelongingTo(@NonEmpty String ownerId) throws IllegalArgumentException;
+    List<Token> getTokensBelongingTo(@NonEmpty String ownerId) throws TException;
 
-    void deleteToken(@NonEmpty String tokenId) throws IllegalArgumentException;
+    void deleteToken(@NonEmpty String tokenId) throws TException;
 
-    default void deleteTokens(@NonNull List<String> tokenIds) throws IllegalArgumentException
+    default void deleteTokens(@NonNull List<String> tokenIds) throws TException
     {
         checkThat(tokenIds).is(notNull());
 
