@@ -69,12 +69,6 @@ final class GetUserTokenInfoOperation implements ThriftOperation<GetUserTokenInf
         return new GetUserTokenInfoResponse().setToken(token.asUserToken());
     }
 
-    @Override
-    public String toString()
-    {
-        return "GetUserTokenInfoOperation{" + "tokenRepository=" + tokenRepository + '}';
-    }
-
     private Token tryGetToken(String tokenId) throws TException
     {
         Token token;
@@ -99,4 +93,9 @@ final class GetUserTokenInfoOperation implements ThriftOperation<GetUserTokenInf
         return token;
     }
 
+    @Override
+    public String toString()
+    {
+        return "GetUserTokenInfoOperation{" + "tokenRepository=" + tokenRepository + '}';
+    }
 }
