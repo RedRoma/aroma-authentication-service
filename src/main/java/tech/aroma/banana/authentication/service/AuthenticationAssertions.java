@@ -18,7 +18,6 @@
 package tech.aroma.banana.authentication.service;
 
 
-import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
@@ -74,7 +73,7 @@ public final class AuthenticationAssertions
             {
                 exists = repository.doesTokenExist(token);
             }
-            catch (TException ex)
+            catch (Exception ex)
             {
                 throw new FailedAssertionException("Could not check in repository", ex);
             }

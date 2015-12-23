@@ -25,6 +25,7 @@ import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.authentication.service.GetTokenInfoRequest;
 import tech.aroma.banana.thrift.authentication.service.GetTokenInfoResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
+import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
@@ -86,9 +87,9 @@ final class GetTokenInfoOperation implements ThriftOperation<GetTokenInfoRequest
         {
             token = tokenRepository.getToken(tokenId);
         }
-        catch (TException ex)
+        catch (IllegalArgumentException ex)
         {
-            throw ex;
+            throw new InvalidTokenException();
         }
         catch (Exception ex)
         {

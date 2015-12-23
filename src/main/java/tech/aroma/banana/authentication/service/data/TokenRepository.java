@@ -18,18 +18,15 @@
 package tech.aroma.banana.authentication.service.data;
 
 import java.util.List;
-import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
-import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
 import tech.sirwellington.alchemy.annotations.arguments.NonNull;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
+import static tech.aroma.banana.authentication.service.AuthenticationAssertions.tokenInRepository;
 import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern.Role.INTERFACE;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 
 /**
@@ -42,20 +39,32 @@ import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 public interface TokenRepository 
 {
 
-    boolean doesTokenExist(@NonEmpty String tokenId) throws InvalidArgumentException, OperationFailedException;
+    boolean doesTokenExist(@NonEmpty String tokenId) throws IllegalArgumentException;
 
-    boolean doesTokenBelongTo(@NonEmpty String tokenId, @NonEmpty String ownerId) throws InvalidArgumentException,
-                                                                                      OperationFailedException;
+    default boolean doesTokenBelongTo(@NonEmpty String tokenId, @NonEmpty String ownerId) throws IllegalArgumentException
+    {
+        checkThat(tokenId, ownerId)
+            .usingMessage("tokenId and ownerId are required")
+            .are(nonEmptyString());
 
-    Token getToken(@NonEmpty String tokenId) throws InvalidArgumentException, OperationFailedException;
+        checkThat(tokenId)
+            .usingMessage("Token does not exist in this repository")
+            .is(tokenInRepository(this));
 
-    void saveToken(@NonNull Token token) throws InvalidArgumentException, OperationFailedException;
+        Token token = this.getToken(tokenId);
 
-    List<Token> getTokensBelongingTo(String ownerId) throws InvalidArgumentException, OperationFailedException;
+        return ownerId.equals(token.getOwnerId());
+    }
 
-    void deleteToken(@NonEmpty String tokenId) throws InvalidArgumentException, OperationFailedException;
+    Token getToken(@NonEmpty String tokenId) throws IllegalArgumentException;
 
-    default void deleteTokens(@NonNull List<String> tokenIds) throws InvalidArgumentException, OperationFailedException
+    void saveToken(@NonNull Token token) throws IllegalArgumentException;
+
+    List<Token> getTokensBelongingTo(@NonEmpty String ownerId) throws IllegalArgumentException;
+
+    void deleteToken(@NonEmpty String tokenId) throws IllegalArgumentException;
+
+    default void deleteTokens(@NonNull List<String> tokenIds) throws IllegalArgumentException
     {
         checkThat(tokenIds).is(notNull());
 

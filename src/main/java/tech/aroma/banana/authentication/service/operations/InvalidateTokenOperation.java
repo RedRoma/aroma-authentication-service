@@ -95,10 +95,6 @@ final class InvalidateTokenOperation implements ThriftOperation<InvalidateTokenR
         {
             repository.deleteToken(tokenId);
         }
-        catch(TException ex)
-        {
-            throw ex;
-        }
         catch(Exception ex)
         {
             throw new OperationFailedException("Could not delete token");

@@ -30,6 +30,7 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
 import static tech.aroma.banana.authentication.service.AuthenticationAssertions.checkRequestNotNull;
+import static tech.aroma.banana.authentication.service.AuthenticationAssertions.tokenInRepository;
 import static tech.aroma.banana.authentication.service.AuthenticationAssertions.withMessage;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
@@ -65,27 +66,34 @@ final class VerifyTokenOperation implements ThriftOperation<VerifyTokenRequest, 
         String tokenId = request.tokenId;
         checkThat(tokenId)
             .throwing(withMessage("missing tokenId"))
-            .is(nonEmptyString());
-        
-        String ownerId = request.ownerId;
-        
-        boolean isTokenGood = false;
-        if (!Strings.isNullOrEmpty(ownerId))
+            .is(nonEmptyString())
+            .throwing(InvalidTokenException.class)
+            .is(tokenInRepository(repository));
+
+        if (shouldCheckAgainstOwner(request))
         {
-            isTokenGood = tryDetermineMatch(tokenId, ownerId);
+            String ownerId = request.ownerId;
+            ensureTokenAndOwnerMatch(tokenId, ownerId);
         }
-        else
-        {
-            isTokenGood = isInRepository(tokenId);
-        }
-        
-        if (!isTokenGood)
+
+        return new VerifyTokenResponse();
+
+    }
+
+    private boolean shouldCheckAgainstOwner(VerifyTokenRequest request)
+    {
+        return request.isSetOwnerId() && !Strings.isNullOrEmpty(request.ownerId);
+    }
+
+    private void ensureTokenAndOwnerMatch(String tokenId, String ownerId) throws OperationFailedException, InvalidTokenException
+    {
+
+        boolean tokenAndOwnerMatch = tryDetermineMatch(tokenId, ownerId);
+
+        if (!tokenAndOwnerMatch)
         {
             throw new InvalidTokenException();
         }
-        
-        return new VerifyTokenResponse();
-
     }
 
     private boolean tryDetermineMatch(String tokenId, String ownerId) throws OperationFailedException
@@ -109,21 +117,4 @@ final class VerifyTokenOperation implements ThriftOperation<VerifyTokenRequest, 
     {
         return "VerifyTokenOperation{" + "repository=" + repository + '}';
     }
-
-    private boolean isInRepository(String tokenId) throws TException
-    {
-        try
-        {
-            return repository.doesTokenExist(tokenId);
-        }
-        catch (TException ex)
-        {
-            throw ex;
-        }
-        catch (Exception ex)
-        {
-            throw new OperationFailedException("Could not read token repository");
-        }
-    }
-
 }
