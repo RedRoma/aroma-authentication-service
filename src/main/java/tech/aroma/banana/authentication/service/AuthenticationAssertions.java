@@ -48,9 +48,7 @@ public final class AuthenticationAssertions
     
     public static void checkRequestNotNull(Object request) throws InvalidArgumentException
     {
-        checkThat(request)
-            .throwing(ex -> new InvalidArgumentException("request missing"))
-            .is(notNull());
+        checkNotNull(request, "missing request");
     }
     
     public static void checkNotNull(Object reference, String message) throws InvalidArgumentException
