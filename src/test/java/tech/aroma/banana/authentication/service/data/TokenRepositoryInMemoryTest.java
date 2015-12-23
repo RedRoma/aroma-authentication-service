@@ -191,6 +191,13 @@ public class TokenRepositoryInMemoryTest
         assertThat(result, notNullValue());
         assertThat(result.isEmpty(), is(true));
     }
+    
+    @Test
+    public void testGetTokensBelongingToWithBadArgs() throws Exception
+    {
+        assertThrows(() -> repository.getTokensBelongingTo(""))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
 
     @Test
     public void testDeleteToken()
