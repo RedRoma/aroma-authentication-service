@@ -92,6 +92,10 @@ final class TokenRepositoryInMemory implements TokenRepository
             .usingMessage("token is null")
             .is(notNull());
         
+        checkThat(token.getTokenType())
+            .usingMessage("tokenType is required")
+            .is(notNull());
+        
         Instant expiration = token.getTimeOfExpiration();
         checkThat(expiration)
             .usingMessage("token is missing an expiration date.")
