@@ -65,8 +65,8 @@ final class InvalidateApplicationTokenOperation implements ThriftOperation<Inval
         checkThat(request.token.tokenId)
             .throwing(InvalidArgumentException.class)
             .is(nonEmptyString());
-        String tokenId = request.token.tokenId;
         
+        String tokenId = request.token.tokenId;
         tryDelete(tokenId);
         
         return new InvalidateApplicationTokenResponse();
