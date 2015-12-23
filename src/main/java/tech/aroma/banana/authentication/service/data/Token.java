@@ -18,6 +18,8 @@ package tech.aroma.banana.authentication.service.data;
 
 import java.time.Instant;
 import java.util.Objects;
+import tech.aroma.banana.thrift.authentication.ApplicationToken;
+import tech.aroma.banana.thrift.authentication.UserToken;
 import tech.sirwellington.alchemy.annotations.concurrency.Mutable;
 import tech.sirwellington.alchemy.annotations.objects.Pojo;
 
@@ -129,6 +131,33 @@ public final class Token
             return false;
         }
         return true;
+    }
+
+    public ApplicationToken asApplicationToken()
+    {
+        ApplicationToken token = new ApplicationToken();
+        token.setTokenId(tokenId)
+            .setApplicationId(ownerId);
+
+        if (timeOfExpiration != null)
+        {
+            token.setTimeOfExpiration(timeOfExpiration.toEpochMilli());
+        }
+
+        return token;
+    }
+
+    public UserToken asUserToken()
+    {
+        UserToken token = new UserToken()
+            .setTokenId(tokenId);
+
+        if (timeOfExpiration != null)
+        {
+            token.setTimeOfExpiration(timeOfExpiration.toEpochMilli());
+        }
+
+        return token;
     }
 
 }
