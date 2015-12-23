@@ -21,22 +21,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationServiceConstants;
-import tech.aroma.banana.thrift.authentication.service.CreateApplicationTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.CreateApplicationTokenResponse;
-import tech.aroma.banana.thrift.authentication.service.CreateUserTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.CreateUserTokenResponse;
-import tech.aroma.banana.thrift.authentication.service.GetApplicationTokenInfoRequest;
-import tech.aroma.banana.thrift.authentication.service.GetApplicationTokenInfoResponse;
-import tech.aroma.banana.thrift.authentication.service.GetUserTokenInfoRequest;
-import tech.aroma.banana.thrift.authentication.service.GetUserTokenInfoResponse;
-import tech.aroma.banana.thrift.authentication.service.InvalidateApplicationTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.InvalidateApplicationTokenResponse;
-import tech.aroma.banana.thrift.authentication.service.InvalidateUserTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.InvalidateUserTokenResponse;
-import tech.aroma.banana.thrift.authentication.service.VerifyApplicationTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.VerifyApplicationTokenResponse;
-import tech.aroma.banana.thrift.authentication.service.VerifyUserTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.VerifyUserTokenResponse;
+import tech.aroma.banana.thrift.authentication.service.AuthenticationToken;
+import tech.aroma.banana.thrift.authentication.service.CreateTokenRequest;
+import tech.aroma.banana.thrift.authentication.service.CreateTokenResponse;
+import tech.aroma.banana.thrift.authentication.service.GetTokenInfoRequest;
+import tech.aroma.banana.thrift.authentication.service.GetTokenInfoResponse;
+import tech.aroma.banana.thrift.authentication.service.InvalidateTokenRequest;
+import tech.aroma.banana.thrift.authentication.service.InvalidateTokenResponse;
+import tech.aroma.banana.thrift.authentication.service.VerifyTokenRequest;
+import tech.aroma.banana.thrift.authentication.service.VerifyTokenResponse;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
@@ -48,130 +41,102 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
  *
  * @author SirWellington
  */
-@Repeat(10)
+@Repeat(100)
 @RunWith(AlchemyTestRunner.class)
-public class AuthenticationServiceImplTest 
+public class AuthenticationServiceImplTest
 {
- 
-    @Mock
-    private ThriftOperation<CreateApplicationTokenRequest, CreateApplicationTokenResponse> createApplicationTokenOperation;
-    @GeneratePojo
-    private CreateApplicationTokenRequest createApplicationTokenRequest;
-    @GeneratePojo
-    private CreateApplicationTokenResponse createApplicationTokenResponse;
 
     @Mock
-    private ThriftOperation<CreateUserTokenRequest, CreateUserTokenResponse> createUserTokenOperation;
+    private ThriftOperation<CreateTokenRequest, CreateTokenResponse> createTokenOperation;
     @GeneratePojo
-    private CreateUserTokenRequest createUserTokenRequest;
+    private CreateTokenRequest createTokenRequest;
     @GeneratePojo
-    private CreateUserTokenResponse createUserTokenResponse;
+    private CreateTokenResponse createTokenResponse;
 
     @Mock
-    private ThriftOperation<GetApplicationTokenInfoRequest, GetApplicationTokenInfoResponse> getApplicationTokenInfoOperation;
+    private ThriftOperation<GetTokenInfoRequest, GetTokenInfoResponse> getTokenInfoOperation;
     @GeneratePojo
-    private GetApplicationTokenInfoRequest getApplicationTokenInfoRequest;
+    private GetTokenInfoRequest getTokenInfoRequest;
     @GeneratePojo
-    private GetApplicationTokenInfoResponse getApplicationTokenInfoResponse;
+    private GetTokenInfoResponse getTokenInfoResponse;
 
     @Mock
-    private ThriftOperation<GetUserTokenInfoRequest, GetUserTokenInfoResponse> getUserTokenInfoOperation;
+    private ThriftOperation<InvalidateTokenRequest, InvalidateTokenResponse> invalidateTokenOperation;
     @GeneratePojo
-    private GetUserTokenInfoRequest getUserTokenInfoRequest;
+    private InvalidateTokenRequest invalidateTokenRequest;
     @GeneratePojo
-    private GetUserTokenInfoResponse getUserTokenInfoResponse;
+    private InvalidateTokenResponse invalidateTokenResponse;
 
     @Mock
-    private ThriftOperation<InvalidateApplicationTokenRequest, InvalidateApplicationTokenResponse> invalidateApplicationTokenOperation;
+    private ThriftOperation<VerifyTokenRequest, VerifyTokenResponse> verifyTokenOperation;
     @GeneratePojo
-    private InvalidateApplicationTokenRequest invalidateApplicationTokenRequest;
+    private VerifyTokenRequest verifyTokenRequest;
     @GeneratePojo
-    private InvalidateApplicationTokenResponse invalidateApplicationTokenResponse;
+    private VerifyTokenResponse verifyTokenResponse;
 
-    @Mock
-    private ThriftOperation<InvalidateUserTokenRequest, InvalidateUserTokenResponse> invalidateUserTokenOperation;
-    @GeneratePojo
-    private InvalidateUserTokenRequest invalidateUserTokenRequest;
-    @GeneratePojo
-    private InvalidateUserTokenResponse invalidateUserTokenResponse;
-
-    @Mock
-    private ThriftOperation<VerifyApplicationTokenRequest, VerifyApplicationTokenResponse> verifyApplicationTokenOperation;
-    @GeneratePojo
-    private VerifyApplicationTokenRequest verifyApplicationTokenRequest;
-    @GeneratePojo
-    private VerifyApplicationTokenResponse verifyApplicationTokenResponse;
-
-    @Mock
-    private ThriftOperation<VerifyUserTokenRequest, VerifyUserTokenResponse> verifyUserTokenOperation;
-    @GeneratePojo
-    private VerifyUserTokenRequest verifyUserTokenRequest;
-    @GeneratePojo
-    private VerifyUserTokenResponse verifyUserTokenResponse;
-    
     private AuthenticationServiceImpl instance;
 
+    private AuthenticationToken authenticationToken;
+    
     @Before
     public void setUp()
     {
-        instance = new AuthenticationServiceImpl(createApplicationTokenOperation,
-                                                 createUserTokenOperation,
-                                                 getApplicationTokenInfoOperation,
-                                                 getUserTokenInfoOperation,
-                                                 invalidateApplicationTokenOperation,
-                                                 invalidateUserTokenOperation,
-                                                 verifyApplicationTokenOperation,
-                                                 verifyUserTokenOperation);
+        instance = new AuthenticationServiceImpl(createTokenOperation,
+                                                 getTokenInfoOperation,
+                                                 invalidateTokenOperation,
+                                                 verifyTokenOperation);
+
+        verifyZeroInteractions(createTokenOperation,
+                               getTokenInfoOperation,
+                               invalidateTokenOperation,
+                               verifyTokenOperation);
         
-        verifyZeroInteractions(createApplicationTokenOperation,
-                               createUserTokenOperation,
-                               getApplicationTokenInfoOperation,
-                               getUserTokenInfoOperation,
-                               invalidateApplicationTokenOperation,
-                               invalidateUserTokenOperation,
-                               verifyApplicationTokenOperation,
-                               verifyUserTokenOperation);
+        authenticationToken = one(TokenGenerators.authenticationTokens());
+        createTokenResponse.setToken(authenticationToken);
+        getTokenInfoResponse.setToken(authenticationToken);
     }
-    
+
     @DontRepeat
     @Test
     public void testConstructWithNullArgument()
     {
         assertThrows(() -> new AuthenticationServiceImpl(null,
-                                                         createUserTokenOperation,
-                                                         getApplicationTokenInfoOperation,
-                                                        getUserTokenInfoOperation,
-                                                         invalidateApplicationTokenOperation,
-                                                         invalidateUserTokenOperation,
-                                                         verifyApplicationTokenOperation,
-                                                         verifyUserTokenOperation))
+                                                           getTokenInfoOperation,
+                                                           invalidateTokenOperation,
+                                                           verifyTokenOperation))
             .isInstanceOf(IllegalArgumentException.class);
-        
-        assertThrows(() -> new AuthenticationServiceImpl(createApplicationTokenOperation,
-                                                         null,
-                                                         getApplicationTokenInfoOperation,
-                                                         getUserTokenInfoOperation,
-                                                         invalidateApplicationTokenOperation,
-                                                         invalidateUserTokenOperation,
-                                                         verifyApplicationTokenOperation,
-                                                         verifyUserTokenOperation))
+
+        assertThrows(() -> new AuthenticationServiceImpl(createTokenOperation,
+                                                           null,
+                                                           invalidateTokenOperation,
+                                                           verifyTokenOperation))
             .isInstanceOf(IllegalArgumentException.class);
-        
+
+        assertThrows(() -> new AuthenticationServiceImpl(createTokenOperation,
+                                                           getTokenInfoOperation,
+                                                           null,
+                                                           verifyTokenOperation))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        assertThrows(() -> new AuthenticationServiceImpl(createTokenOperation,
+                                                           getTokenInfoOperation,
+                                                           invalidateTokenOperation,
+                                                           null))
+            .isInstanceOf(IllegalArgumentException.class);
+
         assertThrows(() -> new AuthenticationServiceImpl(null,
-                                                         null,
-                                                         null,
-                                                         null,
-                                                         null,
-                                                         null,
-                                                         null,
-                                                         null))
+                                                           null,
+                                                           null,
+                                                           null))
             .isInstanceOf(IllegalArgumentException.class);
+
     }
 
     @Test
@@ -179,99 +144,52 @@ public class AuthenticationServiceImplTest
     {
         double response = instance.getApiVersion();
         assertThat(response, is(AuthenticationServiceConstants.API_VERSION));
-        
+
     }
 
     @Test
-    public void testCreateApplicationToken() throws Exception
+    public void testCreateToken() throws Exception
     {
-        when(createApplicationTokenOperation.process(createApplicationTokenRequest))
-            .thenReturn(createApplicationTokenResponse);
-        
-        CreateApplicationTokenResponse response = instance.createApplicationToken(createApplicationTokenRequest);
-        assertThat(response, is(createApplicationTokenResponse));
-        
-        verify(createApplicationTokenOperation).process(createApplicationTokenRequest);
+        when(createTokenOperation.process(createTokenRequest))
+            .thenReturn(createTokenResponse);
+
+        CreateTokenResponse response = instance.createToken(createTokenRequest);
+        assertThat(response, is(createTokenResponse));
+
+        verify(createTokenOperation).process(createTokenRequest);
     }
 
     @Test
-    public void testCreateUserToken() throws Exception
+    public void testGetTokenInfo() throws Exception
     {
-        when(createUserTokenOperation.process(createUserTokenRequest))
-            .thenReturn(createUserTokenResponse);
-        
-        CreateUserTokenResponse response = instance.createUserToken(createUserTokenRequest);
-        assertThat(response, is(createUserTokenResponse));
-        verify(createUserTokenOperation).process(createUserTokenRequest);
+        when(getTokenInfoOperation.process(getTokenInfoRequest))
+            .thenReturn(getTokenInfoResponse);
+
+        GetTokenInfoResponse response = instance.getTokenInfo(getTokenInfoRequest);
+        assertThat(response, is(getTokenInfoResponse));
+        verify(getTokenInfoOperation).process(getTokenInfoRequest);
     }
 
     @Test
-    public void testGetApplicationTokenInfo() throws Exception
+    public void testInvalidateToken() throws Exception
     {
-        when(getApplicationTokenInfoOperation.process(getApplicationTokenInfoRequest))
-            .thenReturn(getApplicationTokenInfoResponse);
-        
-        GetApplicationTokenInfoResponse response = instance.getApplicationTokenInfo(getApplicationTokenInfoRequest);
-        assertThat(response, is(getApplicationTokenInfoResponse));
-        verify(getApplicationTokenInfoOperation).process(getApplicationTokenInfoRequest);
+
+        when(invalidateTokenOperation.process(invalidateTokenRequest))
+            .thenReturn(invalidateTokenResponse);
+
+        InvalidateTokenResponse response = instance.invalidateToken(invalidateTokenRequest);
+        assertThat(response, is(invalidateTokenResponse));
+        verify(invalidateTokenOperation).process(invalidateTokenRequest);
     }
 
     @Test
-    public void testGetUserTokenInfo() throws Exception
+    public void testVerifyToken() throws Exception
     {
-        when(getUserTokenInfoOperation.process(getUserTokenInfoRequest))
-            .thenReturn(getUserTokenInfoResponse);
-        
-        GetUserTokenInfoResponse response = instance.getUserTokenInfo(getUserTokenInfoRequest);
-        assertThat(response, is(getUserTokenInfoResponse));
-        verify(getUserTokenInfoOperation).process(getUserTokenInfoRequest);
-    }
+        when(verifyTokenOperation.process(verifyTokenRequest))
+            .thenReturn(verifyTokenResponse);
 
-    @Test
-    public void testInvalidateApplicationToken() throws Exception
-    {
-        
-        when(invalidateApplicationTokenOperation.process(invalidateApplicationTokenRequest))
-            .thenReturn(invalidateApplicationTokenResponse);
-        
-        InvalidateApplicationTokenResponse response = instance.invalidateApplicationToken(invalidateApplicationTokenRequest);
-        assertThat(response, is(invalidateApplicationTokenResponse));
-        verify(invalidateApplicationTokenOperation).process(invalidateApplicationTokenRequest);
+        VerifyTokenResponse response = instance.verifyToken(verifyTokenRequest);
+        assertThat(response, is(verifyTokenResponse));
+        verify(verifyTokenOperation).process(verifyTokenRequest);
     }
-
-    @Test
-    public void testInvalidateUserToken() throws Exception
-    {
-        
-        when(invalidateUserTokenOperation.process(invalidateUserTokenRequest))
-            .thenReturn(invalidateUserTokenResponse);
-        
-        InvalidateUserTokenResponse response = instance.invalidateUserToken(invalidateUserTokenRequest);
-        assertThat(response, is(invalidateUserTokenResponse));
-        verify(invalidateUserTokenOperation).process(invalidateUserTokenRequest);
-    }
-
-    @Test
-    public void testVerifyApplicationToken() throws Exception
-    {
-        when(verifyApplicationTokenOperation.process(verifyApplicationTokenRequest))
-            .thenReturn(verifyApplicationTokenResponse);
-        
-        VerifyApplicationTokenResponse response = instance.verifyApplicationToken(verifyApplicationTokenRequest);
-        assertThat(response, is(verifyApplicationTokenResponse));
-        verify(verifyApplicationTokenOperation).process(verifyApplicationTokenRequest);
-    }
-
-    @Test
-    public void testVerifyUserToken() throws Exception
-    {
-        
-        when(verifyUserTokenOperation.process(verifyUserTokenRequest))
-            .thenReturn(verifyUserTokenResponse);
-        
-        VerifyUserTokenResponse response = instance.verifyUserToken(verifyUserTokenRequest);
-        assertThat(response, is(verifyUserTokenResponse));
-        verify(verifyUserTokenOperation).process(verifyUserTokenRequest);
-    }
-
 }

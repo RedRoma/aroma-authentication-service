@@ -20,8 +20,15 @@ import java.time.Instant;
 import java.util.Objects;
 import tech.aroma.banana.thrift.authentication.ApplicationToken;
 import tech.aroma.banana.thrift.authentication.UserToken;
+import tech.aroma.banana.thrift.authentication.service.AuthenticationToken;
+import tech.aroma.banana.thrift.authentication.service.TokenType;
 import tech.sirwellington.alchemy.annotations.concurrency.Mutable;
 import tech.sirwellington.alchemy.annotations.objects.Pojo;
+
+import static tech.aroma.banana.thrift.authentication.service.TokenType.APPLICATION;
+import static tech.aroma.banana.thrift.authentication.service.TokenType.USER;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
 /**
  *
@@ -36,6 +43,7 @@ public final class Token
     private Instant timeOfCreation;
     private Instant timeOfExpiration;
     private String ownerId;
+    private TokenType tokenType;
 
     public Token()
     {
@@ -81,20 +89,31 @@ public final class Token
         this.ownerId = ownerId;
     }
 
+    public TokenType getTokenType()
+    {
+        return tokenType;
+    }
+
+    public void setTokenType(TokenType tokenType)
+    {
+        this.tokenType = tokenType;
+    }
+
     @Override
     public String toString()
     {
-        return "Token{" + "tokenId=" + tokenId + ", timeOfCreation=" + timeOfCreation + ", timeOfExpiration=" + timeOfExpiration + ", ownerId=" + ownerId + '}';
+        return "Token{" + "tokenId=" + tokenId + ", timeOfCreation=" + timeOfCreation + ", timeOfExpiration=" + timeOfExpiration + ", ownerId=" + ownerId + ", tokenType=" + tokenType + '}';
     }
 
     @Override
     public int hashCode()
     {
-        int hash = 7;
-        hash = 71 * hash + Objects.hashCode(this.tokenId);
-        hash = 71 * hash + Objects.hashCode(this.timeOfCreation);
-        hash = 71 * hash + Objects.hashCode(this.timeOfExpiration);
-        hash = 71 * hash + Objects.hashCode(this.ownerId);
+        int hash = 3;
+        hash = 59 * hash + Objects.hashCode(this.tokenId);
+        hash = 59 * hash + Objects.hashCode(this.timeOfCreation);
+        hash = 59 * hash + Objects.hashCode(this.timeOfExpiration);
+        hash = 59 * hash + Objects.hashCode(this.ownerId);
+        hash = 59 * hash + Objects.hashCode(this.tokenType);
         return hash;
     }
 
@@ -130,9 +149,32 @@ public final class Token
         {
             return false;
         }
+        if (this.tokenType != other.tokenType)
+        {
+            return false;
+        }
         return true;
     }
 
+    public AuthenticationToken asAuthenticationToken()
+    {
+        checkThat(tokenType)
+            .usingMessage("missing Token Type")
+            .is(notNull());
+
+        AuthenticationToken token = new AuthenticationToken();
+        if (tokenType == APPLICATION)
+        {
+            token.setApplicationToken(asApplicationToken());
+        }
+        else if (tokenType == USER)
+        {
+            token.setUserToken(asUserToken());
+        }
+
+        return token;
+    }
+    
     public ApplicationToken asApplicationToken()
     {
         ApplicationToken token = new ApplicationToken();

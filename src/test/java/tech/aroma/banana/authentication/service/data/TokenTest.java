@@ -21,6 +21,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.aroma.banana.thrift.authentication.ApplicationToken;
 import tech.aroma.banana.thrift.authentication.UserToken;
+import tech.aroma.banana.thrift.authentication.service.AuthenticationToken;
+import tech.aroma.banana.thrift.authentication.service.TokenType;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
@@ -28,16 +30,18 @@ import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static tech.aroma.banana.thrift.authentication.service.TokenType.APPLICATION;
+import static tech.aroma.banana.thrift.authentication.service.TokenType.USER;
 
 /**
  *
  * @author SirWellington
  */
-@Repeat(50)
+@Repeat(100)
 @RunWith(AlchemyTestRunner.class)
-public class TokenTest 
+public class TokenTest
 {
-
+    
     @GeneratePojo
     private Token token;
     
@@ -45,24 +49,45 @@ public class TokenTest
     public void setUp()
     {
     }
-
+    
     @Test
     public void testAsApplicationToken()
     {
+        token.setTokenType(TokenType.APPLICATION);
         ApplicationToken appToken = token.asApplicationToken();
         assertThat(appToken, notNullValue());
         assertThat(appToken.applicationId, is(token.getOwnerId()));
         assertThat(appToken.tokenId, is(token.getTokenId()));
         assertThat(appToken.timeOfExpiration, is(token.getTimeOfExpiration().toEpochMilli()));
     }
-
+    
     @Test
     public void testAsUserToken()
     {
+        token.setTokenType(TokenType.USER);
         UserToken userToken = token.asUserToken();
         assertThat(userToken, notNullValue());
         assertThat(userToken.tokenId, is(token.getTokenId()));
         assertThat(userToken.getTimeOfExpiration(), is(token.getTimeOfExpiration().toEpochMilli()));
     }
-
+    
+    @Test
+    public void testAsAuthenticationToken()
+    {
+        AuthenticationToken authenticationToken = token.asAuthenticationToken();
+        assertThat(authenticationToken, notNullValue());
+        
+        TokenType tokenType = token.getTokenType();
+        assertThat(tokenType, notNullValue());
+        if (tokenType == APPLICATION)
+        {
+            assertThat(authenticationToken.isSetApplicationToken(), is(true));
+        }
+        
+        if (tokenType == USER)
+        {
+            assertThat(authenticationToken.isSetUserToken(), is(true));
+        }
+    }
+    
 }

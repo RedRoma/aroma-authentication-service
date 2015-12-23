@@ -20,16 +20,15 @@ import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.aroma.banana.authentication.service.data.Token;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
-import tech.aroma.banana.thrift.authentication.service.GetApplicationTokenInfoRequest;
-import tech.aroma.banana.thrift.authentication.service.GetApplicationTokenInfoResponse;
-import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
+import tech.aroma.banana.thrift.authentication.service.VerifyTokenRequest;
+import tech.aroma.banana.thrift.authentication.service.VerifyTokenResponse;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
 import static tech.aroma.banana.authentication.service.AuthenticationAssertions.checkRequestNotNull;
+import static tech.aroma.banana.authentication.service.AuthenticationAssertions.withMessage;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
@@ -39,68 +38,57 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
  * @author SirWellington
  */
 @Internal
-final class GetApplicationTokenInfoOperation implements ThriftOperation<GetApplicationTokenInfoRequest, GetApplicationTokenInfoResponse>
+final class VerifyTokenOperation implements ThriftOperation<VerifyTokenRequest, VerifyTokenResponse>
 {
 
-    private final static Logger LOG = LoggerFactory.getLogger(GetApplicationTokenInfoOperation.class);
+    private final static Logger LOG = LoggerFactory.getLogger(VerifyTokenOperation.class);
 
-    private final TokenRepository tokenRepository;
+    private final TokenRepository repository;
 
     @Inject
-    GetApplicationTokenInfoOperation(TokenRepository tokenRepository)
+    VerifyTokenOperation(TokenRepository repository)
     {
-        checkThat(tokenRepository).is(notNull());
+        checkThat(repository).is(notNull());
 
-        this.tokenRepository = tokenRepository;
+        this.repository = repository;
     }
 
     @Override
-    public GetApplicationTokenInfoResponse process(GetApplicationTokenInfoRequest request) throws TException
+    public VerifyTokenResponse process(VerifyTokenRequest request) throws TException
     {
-        LOG.debug("Received request to get token info: {}", request);
+        LOG.debug("Received request to verify an  token: {}", request);
 
         checkRequestNotNull(request);
 
         String tokenId = request.tokenId;
-
         checkThat(tokenId)
-            .throwing(ex -> new InvalidArgumentException("tokenId and applicationid are required"))
+            .throwing(withMessage("missing tokenId"))
             .is(nonEmptyString());
+        
+        return new VerifyTokenResponse();
 
-        Token token = tryGetToken(tokenId);
-
-        return new GetApplicationTokenInfoResponse()
-            .setToken(token.asApplicationToken());
     }
 
-    private Token tryGetToken(String tokenId) throws TException
+    private boolean tryDetermineMatch(String tokenId, String Id) throws OperationFailedException
     {
-        Token token;
+        boolean match;
 
         try
         {
-            token = tokenRepository.getToken(tokenId);
-        }
-        catch (TException ex)
-        {
-            throw ex;
+            match = repository.tokenBelongsTo(tokenId, tokenId);
         }
         catch (Exception ex)
         {
-            throw new OperationFailedException("Failed to load token from repository" + ex.getMessage());
+            throw new OperationFailedException("Could not read repository");
         }
 
-        checkThat(token)
-            .throwing(OperationFailedException.class)
-            .is(notNull());
-
-        return token;
+        return match;
     }
 
     @Override
     public String toString()
     {
-        return "GetApplicationTokenInfoOperation{" + "tokenRepository=" + tokenRepository + '}';
+        return "VerifyTokenOperation{" + "repository=" + repository + '}';
     }
 
 }

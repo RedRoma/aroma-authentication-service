@@ -29,8 +29,8 @@ import tech.aroma.banana.authentication.service.data.Token;
 import tech.aroma.banana.authentication.service.data.TokenCreator;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.LengthOfTime;
-import tech.aroma.banana.thrift.authentication.service.CreateApplicationTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.CreateApplicationTokenResponse;
+import tech.aroma.banana.thrift.authentication.service.CreateTokenRequest;
+import tech.aroma.banana.thrift.authentication.service.CreateTokenResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.aroma.banana.thrift.functions.TimeFunctions;
@@ -54,7 +54,7 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
  * @author SirWellington
  */
 @RunWith(AlchemyTestRunner.class)
-public class CreateApplicationTokenOperationTest 
+public class CreateTokenOperationTest 
 {
 
     private final Function<LengthOfTime, Duration> lengthOfTimeConverter = TimeFunctions.LENGTH_OF_TIME_TO_DURATION;
@@ -65,34 +65,29 @@ public class CreateApplicationTokenOperationTest
     @Mock
     private TokenRepository repository;
 
-    private CreateApplicationTokenRequest request;
+    @GeneratePojo
+    private CreateTokenRequest request;
 
-    private CreateApplicationTokenOperation instance;
+    private CreateTokenOperation instance;
     
     @GenerateString
     private String tokenId;
     
     @GenerateString
-    private String applicationId;
-    
-    @GeneratePojo
-    private LengthOfTime lifetime;
+    private String ownerId;
     
     @Captor
     private ArgumentCaptor<Token> tokenCaptor;
     
+    
     @Before
     public void setUp()
     {
-        instance = new CreateApplicationTokenOperation(lengthOfTimeConverter, tokenCreator, repository);
+        instance = new CreateTokenOperation(lengthOfTimeConverter, tokenCreator, repository);
         verifyZeroInteractions(tokenCreator, repository);
         
-        lifetime.setValue(one(longs(1, 100_000)));
-        
-        
-        request = new CreateApplicationTokenRequest()
-            .setLifetime(lifetime)
-            .setApplicationId(applicationId);
+        request.lifetime.setValue(one(longs(1, 100_000)));
+        request.setOwnerId(ownerId);
         
         when(tokenCreator.create()).thenReturn(tokenId);
     }
@@ -103,7 +98,7 @@ public class CreateApplicationTokenOperationTest
     {
         Instant now = now();
         
-        CreateApplicationTokenResponse response = instance.process(request);
+        CreateTokenResponse response = instance.process(request);
         assertThat(response, notNullValue());
         
         verify(repository).saveToken(tokenCaptor.capture());
@@ -111,13 +106,13 @@ public class CreateApplicationTokenOperationTest
         Token savedToken = tokenCaptor.getValue();
         assertThat(savedToken, notNullValue());
         assertThat(savedToken.getTokenId(), is(tokenId));
-        assertThat(savedToken.getOwnerId(), is(applicationId));
+        assertThat(savedToken.getOwnerId(), is(ownerId));
         
         Instant timeOfCreation = savedToken.getTimeOfCreation();
         Duration timeOfCreationDelta = Duration.between(now, timeOfCreation).abs();
         assertThat(timeOfCreationDelta.getSeconds(), lessThanOrEqualTo(1L));
         
-        Instant expectedTimeOfExpiration = now.plus(lengthOfTimeConverter.apply(lifetime));
+        Instant expectedTimeOfExpiration = now.plus(lengthOfTimeConverter.apply(request.lifetime));
         Instant timeOfExpiration = savedToken.getTimeOfExpiration();
         Duration timeOfExpirationDelta = Duration.between(timeOfExpiration, expectedTimeOfExpiration).abs();
         assertThat(timeOfExpirationDelta.getSeconds(), lessThan(1L));

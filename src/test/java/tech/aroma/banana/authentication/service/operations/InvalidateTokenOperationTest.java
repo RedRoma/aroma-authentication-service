@@ -21,10 +21,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
-import tech.aroma.banana.thrift.authentication.service.InvalidateUserTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.InvalidateUserTokenResponse;
+import tech.aroma.banana.thrift.authentication.ApplicationToken;
+import tech.aroma.banana.thrift.authentication.UserToken;
+import tech.aroma.banana.thrift.authentication.service.AuthenticationToken;
+import tech.aroma.banana.thrift.authentication.service.InvalidateTokenRequest;
+import tech.aroma.banana.thrift.authentication.service.InvalidateTokenResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
+import tech.aroma.banana.thrift.functions.TokenFunctions;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
@@ -32,7 +36,10 @@ import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.BooleanGenerators.booleans;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
@@ -40,56 +47,82 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
  * @author SirWellington
  */
 @RunWith(AlchemyTestRunner.class)
-public class InvalidateUserTokenOperationTest 
+public class InvalidateTokenOperationTest
 {
+
     @Mock
     private TokenRepository repository;
 
     @GeneratePojo
-    private InvalidateUserTokenRequest request;
+    private InvalidateTokenRequest request;
+    
+    @GeneratePojo
+    private ApplicationToken applicationToken;
+    
+    private AuthenticationToken authenticationToken;
+    
+    @GeneratePojo
+    private UserToken userToken;
     
     private String tokenId;
-    
-    private InvalidateUserTokenOperation instance;
+
+    private InvalidateTokenOperation instance;
 
     @Before
     public void setUp()
     {
-        instance = new InvalidateUserTokenOperation(repository);
+        instance = new InvalidateTokenOperation(repository);
         verifyZeroInteractions(repository);
-        
-        tokenId = request.token.tokenId;
+
+        authenticationToken = new AuthenticationToken();
+
+        boolean heads = one(booleans());
+
+        if (heads)
+        {
+            authenticationToken.setApplicationToken(applicationToken);
+        }
+        else
+        {
+            authenticationToken.setUserToken(userToken);
+        }
+
+        request.setToken(authenticationToken);
+
+        tokenId = TokenFunctions.extractTokenId(request.token);
     }
-    
+
     @Test
     public void testConstructor()
     {
-        assertThrows(() -> new InvalidateUserTokenOperation(null))
+        assertThrows(() -> new InvalidateTokenOperation(null))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Repeat(100)
+    @Repeat(200)
     @Test
     public void testProcess() throws Exception
     {
-        InvalidateUserTokenResponse response = instance.process(request);
+        InvalidateTokenResponse response = instance.process(request);
         assertThat(response, notNullValue());
+
+        verify(repository).deleteToken(tokenId);
     }
-    
+
     @Test
     public void testProcessEdgeCases() throws Exception
     {
         assertThrows(() -> instance.process(null))
             .isInstanceOf(InvalidArgumentException.class);
     }
-    
+
     @Test
     public void testWhenRepositoryFails() throws Exception
     {
         doThrow(new RuntimeException())
             .when(repository)
             .deleteToken(tokenId);
-        
+
         assertThrows(() -> instance.process(request))
             .isInstanceOf(OperationFailedException.class);
     }
@@ -101,12 +134,25 @@ public class InvalidateUserTokenOperationTest
 
         assertThrows(() -> instance.process(request))
             .isInstanceOf(InvalidArgumentException.class);
+        
+        request.token = new AuthenticationToken();
+
+        assertThrows(() -> instance.process(request))
+            .isInstanceOf(InvalidArgumentException.class);
+        
     }
 
     @Test
     public void testWithMissingTokenId() throws Exception
     {
-        request.token.tokenId = "";
+        if (request.token.isSetApplicationToken())
+        {
+            request.token.getApplicationToken().setTokenId("");
+        }
+        else if (request.token.isSetUserToken())
+        {
+            request.token.getUserToken().setTokenId("");
+        }
 
         assertThrows(() -> instance.process(request))
             .isInstanceOf(InvalidArgumentException.class);

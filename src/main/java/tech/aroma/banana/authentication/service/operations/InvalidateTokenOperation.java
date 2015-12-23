@@ -22,15 +22,16 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
-import tech.aroma.banana.thrift.authentication.service.InvalidateApplicationTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.InvalidateApplicationTokenResponse;
-import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
+import tech.aroma.banana.thrift.authentication.service.AuthenticationToken;
+import tech.aroma.banana.thrift.authentication.service.InvalidateTokenRequest;
+import tech.aroma.banana.thrift.authentication.service.InvalidateTokenResponse;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
-import static tech.aroma.banana.authentication.service.AuthenticationAssertions.checkNotNull;
 import static tech.aroma.banana.authentication.service.AuthenticationAssertions.checkRequestNotNull;
+import static tech.aroma.banana.authentication.service.AuthenticationAssertions.legalToken;
+import static tech.aroma.banana.authentication.service.AuthenticationAssertions.withMessage;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
@@ -40,15 +41,15 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
  * @author SirWellington
  */
 @Internal
-final class InvalidateApplicationTokenOperation implements ThriftOperation<InvalidateApplicationTokenRequest, InvalidateApplicationTokenResponse>
+final class InvalidateTokenOperation implements ThriftOperation<InvalidateTokenRequest, InvalidateTokenResponse>
 {
 
-    private final static Logger LOG = LoggerFactory.getLogger(InvalidateApplicationTokenOperation.class);
+    private final static Logger LOG = LoggerFactory.getLogger(InvalidateTokenOperation.class);
 
     private final TokenRepository repository;
 
     @Inject
-    InvalidateApplicationTokenOperation(TokenRepository repository)
+    InvalidateTokenOperation(TokenRepository repository)
     {
         checkThat(repository).is(notNull());
         
@@ -56,22 +57,38 @@ final class InvalidateApplicationTokenOperation implements ThriftOperation<Inval
     }
 
     @Override
-    public InvalidateApplicationTokenResponse process(InvalidateApplicationTokenRequest request) throws TException
+    public InvalidateTokenResponse process(InvalidateTokenRequest request) throws TException
     {
         LOG.debug("Received request to invalidate token: {}", request);
 
         checkRequestNotNull(request);
-        checkNotNull(request.token, "request is missing token");
-        checkThat(request.token.tokenId)
-            .throwing(InvalidArgumentException.class)
+        checkThat(request.token)
+            .throwing(withMessage("request is missing token"))
+            .is(notNull())
+            .is(legalToken());
+        
+        String tokenId = extractTokenId(request.token);
+        checkThat(tokenId)
+            .throwing(withMessage("missing tokenId"))
             .is(nonEmptyString());
         
-        String tokenId = request.token.tokenId;
         tryDelete(tokenId);
         
-        return new InvalidateApplicationTokenResponse();
+        return new InvalidateTokenResponse();
     }
 
+    private String extractTokenId(AuthenticationToken token)
+    {
+        if(token.isSetApplicationToken())
+        {
+            return token.getApplicationToken().tokenId;
+        }
+        else
+        {
+            return token.getUserToken().tokenId;
+        }
+    }
+    
     private void tryDelete(String tokenId) throws TException
     {
         try
@@ -91,7 +108,7 @@ final class InvalidateApplicationTokenOperation implements ThriftOperation<Inval
     @Override
     public String toString()
     {
-        return "InvalidateApplicationTokenOperation{" + "repository=" + repository + '}';
+        return "InvalidateTokenOperation{" + "repository=" + repository + '}';
     }
     
 }

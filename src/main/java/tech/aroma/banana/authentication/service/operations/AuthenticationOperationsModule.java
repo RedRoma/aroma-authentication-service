@@ -26,22 +26,14 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.thrift.LengthOfTime;
-import tech.aroma.banana.thrift.authentication.service.CreateApplicationTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.CreateApplicationTokenResponse;
-import tech.aroma.banana.thrift.authentication.service.CreateUserTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.CreateUserTokenResponse;
-import tech.aroma.banana.thrift.authentication.service.GetApplicationTokenInfoRequest;
-import tech.aroma.banana.thrift.authentication.service.GetApplicationTokenInfoResponse;
-import tech.aroma.banana.thrift.authentication.service.GetUserTokenInfoRequest;
-import tech.aroma.banana.thrift.authentication.service.GetUserTokenInfoResponse;
-import tech.aroma.banana.thrift.authentication.service.InvalidateApplicationTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.InvalidateApplicationTokenResponse;
-import tech.aroma.banana.thrift.authentication.service.InvalidateUserTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.InvalidateUserTokenResponse;
-import tech.aroma.banana.thrift.authentication.service.VerifyApplicationTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.VerifyApplicationTokenResponse;
-import tech.aroma.banana.thrift.authentication.service.VerifyUserTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.VerifyUserTokenResponse;
+import tech.aroma.banana.thrift.authentication.service.CreateTokenRequest;
+import tech.aroma.banana.thrift.authentication.service.CreateTokenResponse;
+import tech.aroma.banana.thrift.authentication.service.GetTokenInfoRequest;
+import tech.aroma.banana.thrift.authentication.service.GetTokenInfoResponse;
+import tech.aroma.banana.thrift.authentication.service.InvalidateTokenRequest;
+import tech.aroma.banana.thrift.authentication.service.InvalidateTokenResponse;
+import tech.aroma.banana.thrift.authentication.service.VerifyTokenRequest;
+import tech.aroma.banana.thrift.authentication.service.VerifyTokenResponse;
 import tech.aroma.banana.thrift.functions.TimeFunctions;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
@@ -56,29 +48,18 @@ public final class AuthenticationOperationsModule extends AbstractModule
     @Override
     protected void configure()
     {
-        bind(new TypeLiteral<ThriftOperation<CreateApplicationTokenRequest, CreateApplicationTokenResponse>>() {})
-            .to(CreateApplicationTokenOperation.class);
+        bind(new TypeLiteral<ThriftOperation<CreateTokenRequest, CreateTokenResponse>>() {})
+            .to(CreateTokenOperation.class);
         
-        bind(new TypeLiteral<ThriftOperation<CreateUserTokenRequest, CreateUserTokenResponse>>() {})
-            .to(CreateUserTokenOperation.class);
+        bind(new TypeLiteral<ThriftOperation<GetTokenInfoRequest, GetTokenInfoResponse>>() {})
+            .to(GetTokenInfoOperation.class);
         
-        bind(new TypeLiteral<ThriftOperation<GetApplicationTokenInfoRequest, GetApplicationTokenInfoResponse>>() {})
-            .to(GetApplicationTokenInfoOperation.class);
         
-        bind(new TypeLiteral<ThriftOperation<GetUserTokenInfoRequest, GetUserTokenInfoResponse>>() {})
-            .to(GetUserTokenInfoOperation.class);
+        bind(new TypeLiteral<ThriftOperation<InvalidateTokenRequest, InvalidateTokenResponse>>() {})
+            .to(InvalidateTokenOperation.class);
         
-        bind(new TypeLiteral<ThriftOperation<InvalidateApplicationTokenRequest, InvalidateApplicationTokenResponse>>() {})
-            .to(InvalidateApplicationTokenOperation.class);
-        
-        bind(new TypeLiteral<ThriftOperation<InvalidateUserTokenRequest, InvalidateUserTokenResponse>>() {})
-            .to(InvalidateUserTokenOperation.class);
-        
-        bind(new TypeLiteral<ThriftOperation<VerifyApplicationTokenRequest, VerifyApplicationTokenResponse>>() {})
-            .to(VerifyApplicationTokenOperation.class);
-        
-        bind(new TypeLiteral<ThriftOperation<VerifyUserTokenRequest, VerifyUserTokenResponse>>() {})
-            .to(VerifyUserTokenOperation.class);
+        bind(new TypeLiteral<ThriftOperation<VerifyTokenRequest, VerifyTokenResponse>>() {})
+            .to(VerifyTokenOperation.class);
         
     }
     

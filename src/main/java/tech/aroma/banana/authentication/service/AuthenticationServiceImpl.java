@@ -4,42 +4,29 @@ package tech.aroma.banana.authentication.service;
 /*
  * Copyright 2015 Aroma Tech.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS"
+ * BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  */
-
-
 import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationServiceConstants;
-import tech.aroma.banana.thrift.authentication.service.CreateApplicationTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.CreateApplicationTokenResponse;
-import tech.aroma.banana.thrift.authentication.service.CreateUserTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.CreateUserTokenResponse;
-import tech.aroma.banana.thrift.authentication.service.GetApplicationTokenInfoRequest;
-import tech.aroma.banana.thrift.authentication.service.GetApplicationTokenInfoResponse;
-import tech.aroma.banana.thrift.authentication.service.GetUserTokenInfoRequest;
-import tech.aroma.banana.thrift.authentication.service.GetUserTokenInfoResponse;
-import tech.aroma.banana.thrift.authentication.service.InvalidateApplicationTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.InvalidateApplicationTokenResponse;
-import tech.aroma.banana.thrift.authentication.service.InvalidateUserTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.InvalidateUserTokenResponse;
-import tech.aroma.banana.thrift.authentication.service.VerifyApplicationTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.VerifyApplicationTokenResponse;
-import tech.aroma.banana.thrift.authentication.service.VerifyUserTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.VerifyUserTokenResponse;
+import tech.aroma.banana.thrift.authentication.service.CreateTokenRequest;
+import tech.aroma.banana.thrift.authentication.service.CreateTokenResponse;
+import tech.aroma.banana.thrift.authentication.service.GetTokenInfoRequest;
+import tech.aroma.banana.thrift.authentication.service.GetTokenInfoResponse;
+import tech.aroma.banana.thrift.authentication.service.InvalidateTokenRequest;
+import tech.aroma.banana.thrift.authentication.service.InvalidateTokenResponse;
+import tech.aroma.banana.thrift.authentication.service.VerifyTokenRequest;
+import tech.aroma.banana.thrift.authentication.service.VerifyTokenResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
@@ -50,135 +37,81 @@ import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull
 
 /**
  * This is the Implementation of the {@linkplain AuthenticationService.Iface Banana Authentication Service.}
+ *
  * @author SirWellington
  */
 @Internal
 final class AuthenticationServiceImpl implements AuthenticationService.Iface
 {
+
     private final static Logger LOG = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
-    
-    private final ThriftOperation<CreateApplicationTokenRequest, CreateApplicationTokenResponse> createApplicationTokenOperation;
-    private final ThriftOperation<CreateUserTokenRequest, CreateUserTokenResponse> createUserTokenOperation;
-    private final ThriftOperation<GetApplicationTokenInfoRequest, GetApplicationTokenInfoResponse> getApplicationTokenInfoOperation;
-    private final ThriftOperation<GetUserTokenInfoRequest, GetUserTokenInfoResponse> getUserTokenInfoOperation;
-    private final ThriftOperation<InvalidateApplicationTokenRequest, InvalidateApplicationTokenResponse> invalidateApplicationTokenOperation;
-    private final ThriftOperation<InvalidateUserTokenRequest, InvalidateUserTokenResponse> invalidateUserTokenOperation;
-    private final ThriftOperation<VerifyApplicationTokenRequest, VerifyApplicationTokenResponse> verifyApplicationTokenOperation;
-    private final ThriftOperation<VerifyUserTokenRequest, VerifyUserTokenResponse> verifyUserTokenOperation;
+
+    private final ThriftOperation<CreateTokenRequest, CreateTokenResponse> createTokenOperation;
+    private final ThriftOperation<GetTokenInfoRequest, GetTokenInfoResponse> getTokenInfoOperation;
+    private final ThriftOperation<InvalidateTokenRequest, InvalidateTokenResponse> invalidateTokenOperation;
+    private final ThriftOperation<VerifyTokenRequest, VerifyTokenResponse> verifyTokenOperation;
 
     @Inject
-    AuthenticationServiceImpl(ThriftOperation<CreateApplicationTokenRequest, CreateApplicationTokenResponse> createApplicationTokenOperation,
-                              ThriftOperation<CreateUserTokenRequest, CreateUserTokenResponse> createUserTokenOperation,
-                              ThriftOperation<GetApplicationTokenInfoRequest, GetApplicationTokenInfoResponse> getApplicationTokenInfoOperation,
-                              ThriftOperation<GetUserTokenInfoRequest, GetUserTokenInfoResponse> getUserTokenInfoOperation,
-                              ThriftOperation<InvalidateApplicationTokenRequest, InvalidateApplicationTokenResponse> invalidateApplicationTokenOperation,
-                              ThriftOperation<InvalidateUserTokenRequest, InvalidateUserTokenResponse> invalidateUserTokenOperation,
-                              ThriftOperation<VerifyApplicationTokenRequest, VerifyApplicationTokenResponse> verifyApplicationTokenOperation,
-                              ThriftOperation<VerifyUserTokenRequest, VerifyUserTokenResponse> verifyUserTokenOperation)
+    AuthenticationServiceImpl(ThriftOperation<CreateTokenRequest, CreateTokenResponse> createTokenOperation,
+                              ThriftOperation<GetTokenInfoRequest, GetTokenInfoResponse> getTokenInfoOperation,
+                              ThriftOperation<InvalidateTokenRequest, InvalidateTokenResponse> invalidateTokenOperation,
+                              ThriftOperation<VerifyTokenRequest, VerifyTokenResponse> verifyTokenOperation)
     {
-        checkThat(createApplicationTokenOperation,
-                  createUserTokenOperation,
-                  getApplicationTokenInfoOperation,
-                  getUserTokenInfoOperation,
-                  invalidateApplicationTokenOperation,
-                  invalidateUserTokenOperation,
-                  verifyApplicationTokenOperation,
-                  verifyUserTokenOperation)
+        checkThat(createTokenOperation,
+                  getTokenInfoOperation,
+                  invalidateTokenOperation,
+                  verifyTokenOperation)
             .are(notNull());
-        
-        this.createApplicationTokenOperation = createApplicationTokenOperation;
-        this.createUserTokenOperation = createUserTokenOperation;
-        this.getApplicationTokenInfoOperation = getApplicationTokenInfoOperation;
-        this.getUserTokenInfoOperation = getUserTokenInfoOperation;
-        this.invalidateApplicationTokenOperation = invalidateApplicationTokenOperation;
-        this.invalidateUserTokenOperation = invalidateUserTokenOperation;
-        this.verifyApplicationTokenOperation = verifyApplicationTokenOperation;
-        this.verifyUserTokenOperation = verifyUserTokenOperation;
+
+        this.createTokenOperation = createTokenOperation;
+        this.getTokenInfoOperation = getTokenInfoOperation;
+        this.invalidateTokenOperation = invalidateTokenOperation;
+        this.verifyTokenOperation = verifyTokenOperation;
     }
-    
-    
-    
+
     @Override
     public double getApiVersion() throws TException
     {
         return AuthenticationServiceConstants.API_VERSION;
     }
-    
+
     @Override
-    public CreateApplicationTokenResponse createApplicationToken(CreateApplicationTokenRequest request) throws OperationFailedException,
-                                                                                                               TException
+    public CreateTokenResponse createToken(CreateTokenRequest request) throws OperationFailedException,
+                                                                              TException
     {
         AuthenticationAssertions.checkRequestNotNull(request);
-        
-        return createApplicationTokenOperation.process(request);
+
+        return createTokenOperation.process(request);
     }
-    
+
     @Override
-    public CreateUserTokenResponse createUserToken(CreateUserTokenRequest request) throws OperationFailedException,
-                                                                                          TException
+    public GetTokenInfoResponse getTokenInfo(GetTokenInfoRequest request) throws OperationFailedException,
+                                                                                 InvalidTokenException,
+                                                                                 TException
     {
         AuthenticationAssertions.checkRequestNotNull(request);
-        
-        return createUserTokenOperation.process(request);
+
+        return getTokenInfoOperation.process(request);
     }
-    
+
     @Override
-    public GetApplicationTokenInfoResponse getApplicationTokenInfo(GetApplicationTokenInfoRequest request) throws OperationFailedException,
-                                                                                                                  InvalidTokenException,
-                                                                                                                  TException
-    {
-        AuthenticationAssertions.checkRequestNotNull(request);
-        
-        return getApplicationTokenInfoOperation.process(request);
-    }
-    
-    @Override
-    public GetUserTokenInfoResponse getUserTokenInfo(GetUserTokenInfoRequest request) throws OperationFailedException,
-                                                                                             InvalidTokenException, TException
-    {
-        AuthenticationAssertions.checkRequestNotNull(request);
-        
-        return getUserTokenInfoOperation.process(request);
-    }
-    
-    @Override
-    public InvalidateApplicationTokenResponse invalidateApplicationToken(InvalidateApplicationTokenRequest request) throws OperationFailedException,
-                                                                                                                           InvalidTokenException,
-                                                                                                                           TException
-    {
-        AuthenticationAssertions.checkRequestNotNull(request);
-        
-        return invalidateApplicationTokenOperation.process(request);
-    }
-    
-    @Override
-    public InvalidateUserTokenResponse invalidateUserToken(InvalidateUserTokenRequest request) throws OperationFailedException,
-                                                                                                      InvalidTokenException,
-                                                                                                      TException
-    {
-        AuthenticationAssertions.checkRequestNotNull(request);
-        
-        return invalidateUserTokenOperation.process(request);
-    }
-    
-    @Override
-    public VerifyApplicationTokenResponse verifyApplicationToken(VerifyApplicationTokenRequest request) throws OperationFailedException,
-                                                                                                               InvalidTokenException,
-                                                                                                               TException
-    {
-        AuthenticationAssertions.checkRequestNotNull(request);
-        
-        return verifyApplicationTokenOperation.process(request);
-    }
-    
-    @Override
-    public VerifyUserTokenResponse verifyUserToken(VerifyUserTokenRequest request) throws OperationFailedException,
+    public InvalidateTokenResponse invalidateToken(InvalidateTokenRequest request) throws OperationFailedException,
                                                                                           InvalidTokenException,
                                                                                           TException
     {
         AuthenticationAssertions.checkRequestNotNull(request);
-        
-        return verifyUserTokenOperation.process(request);
+
+        return invalidateTokenOperation.process(request);
     }
-    
+
+    @Override
+    public VerifyTokenResponse verifyToken(VerifyTokenRequest request) throws OperationFailedException,
+                                                                              InvalidTokenException,
+                                                                              TException
+    {
+        AuthenticationAssertions.checkRequestNotNull(request);
+
+        return verifyTokenOperation.process(request);
+    }
+
 }

@@ -20,16 +20,17 @@ import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.aroma.banana.authentication.service.data.Token;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
-import tech.aroma.banana.thrift.authentication.service.InvalidateUserTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.InvalidateUserTokenResponse;
+import tech.aroma.banana.thrift.authentication.service.GetTokenInfoRequest;
+import tech.aroma.banana.thrift.authentication.service.GetTokenInfoResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
-import static tech.aroma.banana.authentication.service.AuthenticationAssertions.checkNotNull;
 import static tech.aroma.banana.authentication.service.AuthenticationAssertions.checkRequestNotNull;
+import static tech.aroma.banana.authentication.service.AuthenticationAssertions.withMessage;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
@@ -39,42 +40,51 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.n
  * @author SirWellington
  */
 @Internal
-final class InvalidateUserTokenOperation implements ThriftOperation<InvalidateUserTokenRequest, InvalidateUserTokenResponse>
+final class GetTokenInfoOperation implements ThriftOperation<GetTokenInfoRequest, GetTokenInfoResponse>
 {
 
-    private final static Logger LOG = LoggerFactory.getLogger(InvalidateUserTokenOperation.class);
+    private final static Logger LOG = LoggerFactory.getLogger(GetTokenInfoOperation.class);
 
-    private final TokenRepository repository;
+    private final TokenRepository tokenRepository;
 
     @Inject
-    InvalidateUserTokenOperation(TokenRepository repository)
+    GetTokenInfoOperation(TokenRepository tokenRepository)
     {
-        checkThat(repository).is(notNull());
+        checkThat(tokenRepository).is(notNull());
 
-        this.repository = repository;
+        this.tokenRepository = tokenRepository;
     }
 
     @Override
-    public InvalidateUserTokenResponse process(InvalidateUserTokenRequest request) throws TException
+    public GetTokenInfoResponse process(GetTokenInfoRequest request) throws TException
     {
-        LOG.debug("Received request to invalidate token: {}", request);
+        LOG.debug("Received request to get token info: {}", request);
+
         checkRequestNotNull(request);
-        checkNotNull(request.token, "missing token");
 
-        String tokenId = request.token.tokenId;
+        String tokenId = request.tokenId;
+
         checkThat(tokenId)
-            .throwing(ex -> new InvalidArgumentException("missing tokenId"))
+            .throwing(ex -> new InvalidArgumentException("tokenId and id are required"))
             .is(nonEmptyString());
-        tryDelete(tokenId);
 
-        return new InvalidateUserTokenResponse();
+        checkThat(request.tokenType)
+            .throwing(withMessage("token type is required"))
+            .is(notNull());
+
+        Token token = tryGetToken(tokenId);
+        
+        return new GetTokenInfoResponse()
+            .setToken(token.asAuthenticationToken());
     }
 
-    private void tryDelete(String tokenId) throws TException
+    private Token tryGetToken(String tokenId) throws TException
     {
+        Token token;
+
         try
         {
-            repository.deleteToken(tokenId);
+            token = tokenRepository.getToken(tokenId);
         }
         catch (TException ex)
         {
@@ -82,15 +92,20 @@ final class InvalidateUserTokenOperation implements ThriftOperation<InvalidateUs
         }
         catch (Exception ex)
         {
-            throw new OperationFailedException("Failed to delete token from repository: " + ex.getMessage());
+            throw new OperationFailedException("Failed to load token from repository" + ex.getMessage());
         }
 
+        checkThat(token)
+            .throwing(OperationFailedException.class)
+            .is(notNull());
+
+        return token;
     }
 
     @Override
     public String toString()
     {
-        return "InvalidateUserTokenOperation{" + "repository=" + repository + '}';
+        return "GetTokenInfoOperation{" + "tokenRepository=" + tokenRepository + '}';
     }
 
 }

@@ -23,21 +23,20 @@ import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.aroma.banana.authentication.service.AuthenticationAssertions;
 import tech.aroma.banana.authentication.service.data.Token;
 import tech.aroma.banana.authentication.service.data.TokenCreator;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.LengthOfTime;
 import tech.aroma.banana.thrift.TimeUnit;
-import tech.aroma.banana.thrift.authentication.ApplicationToken;
-import tech.aroma.banana.thrift.authentication.service.CreateApplicationTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.CreateApplicationTokenResponse;
-import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
+import tech.aroma.banana.thrift.authentication.service.CreateTokenRequest;
+import tech.aroma.banana.thrift.authentication.service.CreateTokenResponse;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
 import static java.time.Instant.now;
+import static tech.aroma.banana.authentication.service.AuthenticationAssertions.checkRequestNotNull;
+import static tech.aroma.banana.authentication.service.AuthenticationAssertions.withMessage;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
@@ -48,10 +47,10 @@ import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.s
  * @author SirWellington
  */
 @Internal
-final class CreateApplicationTokenOperation implements ThriftOperation<CreateApplicationTokenRequest, CreateApplicationTokenResponse>
+final class CreateTokenOperation implements ThriftOperation<CreateTokenRequest, CreateTokenResponse>
 {
 
-    private final static Logger LOG = LoggerFactory.getLogger(CreateApplicationTokenOperation.class);
+    private final static Logger LOG = LoggerFactory.getLogger(CreateTokenOperation.class);
     private final static LengthOfTime DEFAULT_LIFETIME = new LengthOfTime(TimeUnit.DAYS, 30);
 
     private final Function<LengthOfTime, Duration> lengthOfTimeConverter;
@@ -59,7 +58,7 @@ final class CreateApplicationTokenOperation implements ThriftOperation<CreateApp
     private final TokenRepository repository;
 
     @Inject
-    CreateApplicationTokenOperation(Function<LengthOfTime, Duration> lengthOfTimeConverter,
+    CreateTokenOperation(Function<LengthOfTime, Duration> lengthOfTimeConverter,
                                     TokenCreator tokenCreator,
                                     TokenRepository repository)
     {
@@ -72,19 +71,24 @@ final class CreateApplicationTokenOperation implements ThriftOperation<CreateApp
     }
 
     @Override
-    public CreateApplicationTokenResponse process(CreateApplicationTokenRequest request) throws TException
+    public CreateTokenResponse process(CreateTokenRequest request) throws TException
     {
-        LOG.debug("Received request to create an Application Token: {}", request);
+        LOG.debug("Received request to create an  Token: {}", request);
 
-        AuthenticationAssertions.checkRequestNotNull(request);
-        checkThat(request.applicationId)
-            .throwing(ex -> new InvalidArgumentException("bad applicationId"))
+        checkRequestNotNull(request);
+        
+        checkThat(request.desiredTokenType)
+            .throwing(withMessage("Token Type is required"))
+            .is(notNull());
+        
+        checkThat(request.ownerId)
+            .throwing(withMessage("bad owner ID"))
             .is(nonEmptyString())
             .is(stringWithLengthGreaterThanOrEqualTo(3));
         
         if (!request.isSetLifetime())
         {
-            LOG.info("Application Token Lifetime not set. Defaulting to {}", DEFAULT_LIFETIME);
+            LOG.info(" Token Lifetime not set. Defaulting to {}", DEFAULT_LIFETIME);
             request.setLifetime(DEFAULT_LIFETIME);
         }
         
@@ -96,8 +100,9 @@ final class CreateApplicationTokenOperation implements ThriftOperation<CreateApp
 
         Token token = new Token();
         token.setTokenId(tokenId);
-        token.setOwnerId(request.applicationId);
+        token.setOwnerId(request.ownerId);
         token.setTimeOfCreation(timeOfCreation);
+        token.setTokenType(request.desiredTokenType);
         
         Duration tokenLifetime = lengthOfTimeConverter.apply(request.lifetime);
         Instant timeOfExpiration = timeOfCreation.plus(tokenLifetime);
@@ -106,22 +111,14 @@ final class CreateApplicationTokenOperation implements ThriftOperation<CreateApp
         repository.saveToken(token);
         LOG.debug("Saved token to repository: {}", token);
         
-        
-        ApplicationToken applicationToken = toApplicationToken(token);
-        
-        return new CreateApplicationTokenResponse()
-            .setToken(applicationToken);
+        return new CreateTokenResponse()
+            .setToken(token.asAuthenticationToken());
     }
     
-    private ApplicationToken toApplicationToken(Token token)
-    {
-        return token.asApplicationToken();
-    }
-
     @Override
     public String toString()
     {
-        return "CreateApplicationTokenOperation{" + "lengthOfTimeConverter=" + lengthOfTimeConverter + ", tokenCreator=" + tokenCreator + ", tokenRepository=" + repository + '}';
+        return "CreateTokenOperation{" + "lengthOfTimeConverter=" + lengthOfTimeConverter + ", tokenCreator=" + tokenCreator + ", tokenRepository=" + repository + '}';
     }
     
 }
