@@ -51,6 +51,7 @@ final class TokenRepositoryInMemory implements TokenRepository
     @Override
     public boolean doesTokenExist(String tokenId) throws IllegalArgumentException
     {
+        checkThat(tokenId).is(nonEmptyString());
 
         if (!tokens.containsKey(tokenId))
         {
@@ -61,6 +62,7 @@ final class TokenRepositoryInMemory implements TokenRepository
         {
             LOG.debug("Token is now expired. Removing it. {}", tokenId);
             removeToken(tokenId);
+            return false;
         }
         
         return true;
