@@ -65,7 +65,7 @@ public class CreateUserTokenOperationTest
     @Mock
     private TokenRepository tokenRepository;
     
-    private Function<LengthOfTime, Duration> lengthOfTimeConverter = TimeFunctions.LENGTH_OF_TIME_TO_DURATION;
+    private final Function<LengthOfTime, Duration> lengthOfTimeConverter = TimeFunctions.LENGTH_OF_TIME_TO_DURATION;
     
     @GenerateString
     private String tokenId;
