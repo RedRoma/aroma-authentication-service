@@ -16,17 +16,23 @@
 
 package tech.aroma.banana.authentication.service.operations;
 
+import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.aroma.banana.authentication.service.AuthenticationAssertions;
+import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.authentication.service.InvalidateUserTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.InvalidateUserTokenResponse;
+import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
+import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
-import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
-import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
+import static tech.aroma.banana.authentication.service.AuthenticationAssertions.checkNotNull;
+import static tech.aroma.banana.authentication.service.AuthenticationAssertions.checkRequestNotNull;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
  *
@@ -38,16 +44,47 @@ final class InvalidateUserTokenOperation implements ThriftOperation<InvalidateUs
 
     private final static Logger LOG = LoggerFactory.getLogger(InvalidateUserTokenOperation.class);
 
+    private final TokenRepository repository;
+
+    @Inject
+    InvalidateUserTokenOperation(TokenRepository repository)
+    {
+        checkThat(repository).is(notNull());
+
+        this.repository = repository;
+    }
+
     @Override
     public InvalidateUserTokenResponse process(InvalidateUserTokenRequest request) throws TException
     {
-        AuthenticationAssertions.checkRequestNotNull(request);
-
         LOG.debug("Received request to invalidate token: {}", request);
+        checkRequestNotNull(request);
+        checkNotNull(request.token, "missing token");
+        
+        String tokenId = request.token.tokenId;
+        checkThat(tokenId)
+            .throwing(ex -> new InvalidArgumentException("missing tokenId"))
+            .is(nonEmptyString());
+        tryDelete(tokenId);
+        
+        return new InvalidateUserTokenResponse();
+    }
 
-        InvalidateUserTokenResponse response = one((pojos(InvalidateUserTokenResponse.class)));
+    private void tryDelete(String tokenId) throws TException
+    {
+        try
+        {
+            repository.deleteToken(tokenId);
+        }
+        catch (TException ex)
+        {
+            throw ex;
+        }
+        catch (Exception ex)
+        {
+            throw new OperationFailedException("Failed to delete token from repository: " + ex.getMessage());
+        }
 
-        return response;
     }
 
 }
