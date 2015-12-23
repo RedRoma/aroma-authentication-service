@@ -121,4 +121,10 @@ final class CreateApplicationTokenOperation implements ThriftOperation<CreateApp
             .setApplicationId(token.getOwnerId());
     }
 
+    @Override
+    public String toString()
+    {
+        return "CreateApplicationTokenOperation{" + "lengthOfTimeConverter=" + lengthOfTimeConverter + ", tokenCreator=" + tokenCreator + ", tokenRepository=" + tokenRepository + '}';
+    }
+    
 }
