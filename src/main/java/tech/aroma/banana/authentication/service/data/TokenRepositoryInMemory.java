@@ -113,6 +113,7 @@ final class TokenRepositoryInMemory implements TokenRepository
         
         List<Token> ownerTokens = tokensByOwner.getOrDefault(ownerId, Lists.newArrayList());
         ownerTokens.add(token);
+        tokensByOwner.put(ownerId, ownerTokens);
     }
 
     @Override

@@ -16,8 +16,10 @@
 
 package tech.aroma.banana.authentication.service.data;
 
+import com.google.common.collect.Sets;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,10 +32,12 @@ import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static java.time.Instant.now;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
 import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
+import static tech.sirwellington.alchemy.generator.StringGenerators.hexadecimalString;
 import static tech.sirwellington.alchemy.generator.TimeGenerators.futureInstants;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
@@ -166,8 +170,26 @@ public class TokenRepositoryInMemoryTest
     }
 
     @Test
-    public void testGetTokensBelongingTo()
+    public void testGetTokensBelongingTo() throws Exception
     {
+        for (Token token : tokens)
+        {
+            repository.saveToken(token);
+        }
+
+        List<Token> result = repository.getTokensBelongingTo(ownerId);
+        Set<Token> expected = Sets.newHashSet(tokens);
+        Set<Token> resultSet = Sets.newHashSet(result);
+        assertThat(resultSet, is(expected));
+    }
+    
+    @Test
+    public void testGetTokensWhenNoneExistForOwner() throws Exception
+    {
+        String ownerId = one(hexadecimalString(10));
+        List<Token> result = repository.getTokensBelongingTo(ownerId);
+        assertThat(result, notNullValue());
+        assertThat(result.isEmpty(), is(true));
     }
 
     @Test
