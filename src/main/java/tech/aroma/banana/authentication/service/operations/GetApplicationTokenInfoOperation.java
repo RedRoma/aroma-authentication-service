@@ -25,7 +25,7 @@ import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.authentication.service.GetApplicationTokenInfoRequest;
 import tech.aroma.banana.thrift.authentication.service.GetApplicationTokenInfoResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
-import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
+import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
@@ -67,11 +67,9 @@ final class GetApplicationTokenInfoOperation implements ThriftOperation<GetAppli
             .throwing(ex -> new InvalidArgumentException("tokenId and applicationid are required"))
             .is(nonEmptyString());
         
-        Token token = tokenRepository.getToken(tokenId);
+        Token token = tryGetToken(tokenId);
         
-        checkThat(token)
-            .throwing(InvalidTokenException.class)
-            .is(notNull());
+        
         
         return new GetApplicationTokenInfoResponse()
             .setToken(token.asApplicationToken())
@@ -82,6 +80,30 @@ final class GetApplicationTokenInfoOperation implements ThriftOperation<GetAppli
     public String toString()
     {
         return "GetApplicationTokenInfoOperation{" + "tokenRepository=" + tokenRepository + '}';
+    }
+
+    private Token tryGetToken(String tokenId) throws TException
+    {
+        Token token;
+        
+        try
+        {
+            token = tokenRepository.getToken(tokenId);
+        }
+        catch (TException ex)
+        {
+            throw ex;
+        }
+        catch (Exception ex)
+        {
+            throw new OperationFailedException("Failed to load token from repository" + ex.getMessage());
+        }
+        
+        checkThat(token)
+            .throwing(OperationFailedException.class)
+            .is(notNull());
+        
+        return token;
     }
     
 

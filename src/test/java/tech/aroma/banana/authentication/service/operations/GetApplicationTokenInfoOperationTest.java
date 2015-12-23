@@ -86,10 +86,20 @@ public class GetApplicationTokenInfoOperationTest
     public void testWhenRepositoryFails() throws Exception
     {
         when(tokenRepository.getToken(request.tokenId))
-            .thenThrow(new OperationFailedException());
+            .thenThrow(new RuntimeException());
         
         assertThrows(() -> instance.process(request))
             .isInstanceOf(OperationFailedException.class);
             
+    }
+    
+    @Test
+    public void testWhenRepositoryReturnsNull() throws Exception
+    {
+        when(tokenRepository.getToken(request.tokenId))
+            .thenReturn(null);
+        
+        assertThrows(() -> instance.process(request))
+            .isInstanceOf(OperationFailedException.class);
     }
 }
