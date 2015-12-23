@@ -46,7 +46,7 @@ public class GetUserTokenInfoOperationTest
 {
 
     @Mock
-    private TokenRepository tokenRepository;
+    private TokenRepository repository;
 
     @GeneratePojo
     private GetUserTokenInfoRequest request;
@@ -59,13 +59,13 @@ public class GetUserTokenInfoOperationTest
     @Before
     public void setUp() throws Exception
     {
-        instance = new GetUserTokenInfoOperation(tokenRepository);
+        instance = new GetUserTokenInfoOperation(repository);
 
-        verifyZeroInteractions(tokenRepository);
+        verifyZeroInteractions(repository);
 
         request.setTokenId(token.getTokenId());
 
-        when(tokenRepository.getToken(request.tokenId))
+        when(repository.getToken(request.tokenId))
             .thenReturn(token);
     }
 
@@ -86,7 +86,7 @@ public class GetUserTokenInfoOperationTest
     @Test
     public void testWhenRepositoryFails() throws Exception
     {
-        when(tokenRepository.getToken(request.tokenId))
+        when(repository.getToken(request.tokenId))
             .thenThrow(new RuntimeException());
 
         assertThrows(() -> instance.process(request))
@@ -97,7 +97,7 @@ public class GetUserTokenInfoOperationTest
     @Test
     public void testWhenRepositoryReturnsNull() throws Exception
     {
-        when(tokenRepository.getToken(request.tokenId))
+        when(repository.getToken(request.tokenId))
             .thenReturn(null);
 
         assertThrows(() -> instance.process(request))

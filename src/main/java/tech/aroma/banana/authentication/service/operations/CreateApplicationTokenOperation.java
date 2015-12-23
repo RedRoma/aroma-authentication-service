@@ -56,19 +56,19 @@ final class CreateApplicationTokenOperation implements ThriftOperation<CreateApp
 
     private final Function<LengthOfTime, Duration> lengthOfTimeConverter;
     private final TokenCreator tokenCreator;
-    private final TokenRepository tokenRepository;
+    private final TokenRepository repository;
 
     @Inject
     CreateApplicationTokenOperation(Function<LengthOfTime, Duration> lengthOfTimeConverter,
                                     TokenCreator tokenCreator,
-                                    TokenRepository tokenRepository)
+                                    TokenRepository repository)
     {
-        checkThat(lengthOfTimeConverter, tokenCreator, tokenRepository)
+        checkThat(lengthOfTimeConverter, tokenCreator, repository)
             .are(notNull());
 
         this.lengthOfTimeConverter = lengthOfTimeConverter;
         this.tokenCreator = tokenCreator;
-        this.tokenRepository = tokenRepository;
+        this.repository = repository;
     }
 
     @Override
@@ -103,7 +103,7 @@ final class CreateApplicationTokenOperation implements ThriftOperation<CreateApp
         Instant timeOfExpiration = timeOfCreation.plus(tokenLifetime);
         token.setTimeOfExpiration(timeOfExpiration);
         
-        tokenRepository.saveToken(token);
+        repository.saveToken(token);
         LOG.debug("Saved token to repository: {}", token);
         
         
@@ -121,7 +121,7 @@ final class CreateApplicationTokenOperation implements ThriftOperation<CreateApp
     @Override
     public String toString()
     {
-        return "CreateApplicationTokenOperation{" + "lengthOfTimeConverter=" + lengthOfTimeConverter + ", tokenCreator=" + tokenCreator + ", tokenRepository=" + tokenRepository + '}';
+        return "CreateApplicationTokenOperation{" + "lengthOfTimeConverter=" + lengthOfTimeConverter + ", tokenCreator=" + tokenCreator + ", tokenRepository=" + repository + '}';
     }
     
 }

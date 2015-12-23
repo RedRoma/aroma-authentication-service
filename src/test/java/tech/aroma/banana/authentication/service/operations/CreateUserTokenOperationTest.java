@@ -63,7 +63,7 @@ public class CreateUserTokenOperationTest
     private TokenCreator tokenCreator;
     
     @Mock
-    private TokenRepository tokenRepository;
+    private TokenRepository repository;
     
     private final Function<LengthOfTime, Duration> lengthOfTimeConverter = TimeFunctions.LENGTH_OF_TIME_TO_DURATION;
     
@@ -84,8 +84,8 @@ public class CreateUserTokenOperationTest
     @Before
     public void setUp()
     {
-        instance = new CreateUserTokenOperation(tokenCreator, tokenRepository, lengthOfTimeConverter);
-        verifyZeroInteractions(tokenCreator, tokenRepository);
+        instance = new CreateUserTokenOperation(tokenCreator, repository, lengthOfTimeConverter);
+        verifyZeroInteractions(tokenCreator, repository);
         
         when(tokenCreator.create()).thenReturn(tokenId);
         
@@ -97,13 +97,13 @@ public class CreateUserTokenOperationTest
     @Test
     public void testWithBadConstructorArgs()
     {
-        assertThrows(() -> new CreateUserTokenOperation(null, tokenRepository, lengthOfTimeConverter))
+        assertThrows(() -> new CreateUserTokenOperation(null, repository, lengthOfTimeConverter))
             .isInstanceOf(IllegalArgumentException.class);
         
         assertThrows(() -> new CreateUserTokenOperation(tokenCreator, null, lengthOfTimeConverter))
             .isInstanceOf(IllegalArgumentException.class);
         
-        assertThrows(() -> new CreateUserTokenOperation(tokenCreator, tokenRepository, null))
+        assertThrows(() -> new CreateUserTokenOperation(tokenCreator, repository, null))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -116,7 +116,7 @@ public class CreateUserTokenOperationTest
         CreateUserTokenResponse response = instance.process(request);
         assertThat(response, notNullValue());
 
-        verify(tokenRepository).saveToken(tokenCaptor.capture());
+        verify(repository).saveToken(tokenCaptor.capture());
         Token token = tokenCaptor.getValue();
         assertThat(token, notNullValue());
         assertThat(token.getOwnerId(), is(userId));
@@ -153,7 +153,7 @@ public class CreateUserTokenOperationTest
     public void testWhenRepositoryFails() throws Exception
     {
         doThrow(new OperationFailedException())
-            .when(tokenRepository)
+            .when(repository)
             .saveToken(Mockito.any());
         
         assertThrows(() -> instance.process(request))

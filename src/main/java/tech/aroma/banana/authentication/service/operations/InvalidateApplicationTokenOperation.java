@@ -22,6 +22,7 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.authentication.service.AuthenticationAssertions;
+import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.authentication.service.InvalidateApplicationTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.InvalidateApplicationTokenResponse;
 import tech.sirwellington.alchemy.annotations.access.Internal;
@@ -38,6 +39,8 @@ import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
 final class InvalidateApplicationTokenOperation implements ThriftOperation<InvalidateApplicationTokenRequest, InvalidateApplicationTokenResponse>
 {
     private final static Logger LOG = LoggerFactory.getLogger(InvalidateApplicationTokenOperation.class);
+    
+    private TokenRepository repository;
 
     @Override
     public InvalidateApplicationTokenResponse process(InvalidateApplicationTokenRequest request) throws TException

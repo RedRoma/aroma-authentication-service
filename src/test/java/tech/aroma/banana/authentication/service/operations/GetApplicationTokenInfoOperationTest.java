@@ -44,7 +44,7 @@ import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThr
 public class GetApplicationTokenInfoOperationTest
 {
     @Mock
-    private TokenRepository tokenRepository;
+    private TokenRepository repository;
     
     @GeneratePojo
     private GetApplicationTokenInfoRequest request;
@@ -57,10 +57,10 @@ public class GetApplicationTokenInfoOperationTest
     @Before
     public void setUp() throws Exception
     {
-        instance = new GetApplicationTokenInfoOperation(tokenRepository);
-        verifyZeroInteractions(tokenRepository);
+        instance = new GetApplicationTokenInfoOperation(repository);
+        verifyZeroInteractions(repository);
         
-        when(tokenRepository.getToken(token.getTokenId()))
+        when(repository.getToken(token.getTokenId()))
             .thenReturn(token);
         
         request.setTokenId(token.getTokenId());
@@ -85,7 +85,7 @@ public class GetApplicationTokenInfoOperationTest
     @Test
     public void testWhenRepositoryFails() throws Exception
     {
-        when(tokenRepository.getToken(request.tokenId))
+        when(repository.getToken(request.tokenId))
             .thenThrow(new RuntimeException());
         
         assertThrows(() -> instance.process(request))
@@ -96,7 +96,7 @@ public class GetApplicationTokenInfoOperationTest
     @Test
     public void testWhenRepositoryReturnsNull() throws Exception
     {
-        when(tokenRepository.getToken(request.tokenId))
+        when(repository.getToken(request.tokenId))
             .thenReturn(null);
         
         assertThrows(() -> instance.process(request))

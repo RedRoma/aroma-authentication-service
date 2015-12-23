@@ -63,7 +63,7 @@ public class CreateApplicationTokenOperationTest
     private TokenCreator tokenCreator;
     
     @Mock
-    private TokenRepository tokenRepository;
+    private TokenRepository repository;
 
     private CreateApplicationTokenRequest request;
 
@@ -84,8 +84,8 @@ public class CreateApplicationTokenOperationTest
     @Before
     public void setUp()
     {
-        instance = new CreateApplicationTokenOperation(lengthOfTimeConverter, tokenCreator, tokenRepository);
-        verifyZeroInteractions(tokenCreator, tokenRepository);
+        instance = new CreateApplicationTokenOperation(lengthOfTimeConverter, tokenCreator, repository);
+        verifyZeroInteractions(tokenCreator, repository);
         
         lifetime.setValue(one(longs(1, 100_000)));
         
@@ -106,7 +106,7 @@ public class CreateApplicationTokenOperationTest
         CreateApplicationTokenResponse response = instance.process(request);
         assertThat(response, notNullValue());
         
-        verify(tokenRepository).saveToken(tokenCaptor.capture());
+        verify(repository).saveToken(tokenCaptor.capture());
         
         Token savedToken = tokenCaptor.getValue();
         assertThat(savedToken, notNullValue());
