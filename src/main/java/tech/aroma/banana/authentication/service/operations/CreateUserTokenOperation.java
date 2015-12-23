@@ -70,8 +70,6 @@ final class CreateUserTokenOperation implements ThriftOperation<CreateUserTokenR
         this.repository = repository;
         this.lengthOfTimeConverter = lengthOfTimeConverter;
     }
-    
-    
 
     @Override
     public CreateUserTokenResponse process(CreateUserTokenRequest request) throws TException
