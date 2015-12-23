@@ -55,19 +55,19 @@ final class CreateUserTokenOperation implements ThriftOperation<CreateUserTokenR
     private final static LengthOfTime DEFAULT_LIFETIME = new LengthOfTime(TimeUnit.DAYS, 1);
 
     private final TokenCreator tokenCreator;
-    private final TokenRepository tokenRepository;
+    private final TokenRepository repository;
     private final Function<LengthOfTime, Duration> lengthOfTimeConverter;
 
     @Inject
     CreateUserTokenOperation(TokenCreator tokenCreator,
-                             TokenRepository tokenRepository,
+                             TokenRepository repository,
                              Function<LengthOfTime, Duration> lengthOfTimeConverter)
     {
-        checkThat(tokenCreator, tokenRepository, lengthOfTimeConverter)
+        checkThat(tokenCreator, repository, lengthOfTimeConverter)
             .are(notNull());
         
         this.tokenCreator = tokenCreator;
-        this.tokenRepository = tokenRepository;
+        this.repository = repository;
         this.lengthOfTimeConverter = lengthOfTimeConverter;
     }
     
@@ -97,7 +97,7 @@ final class CreateUserTokenOperation implements ThriftOperation<CreateUserTokenR
         
         Duration tokenDuration = getDurationFrom(request);
         token.setTimeOfExpiration(tokenCreation.plus(tokenDuration));
-        tokenRepository.saveToken(token);
+        repository.saveToken(token);
 
         UserToken userToken = toUserToken(token);
 
@@ -128,7 +128,7 @@ final class CreateUserTokenOperation implements ThriftOperation<CreateUserTokenR
     @Override
     public String toString()
     {
-        return "CreateUserTokenOperation{" + "tokenCreator=" + tokenCreator + ", tokenRepository=" + tokenRepository + ", lengthOfTimeConverter=" + lengthOfTimeConverter + '}';
+        return "CreateUserTokenOperation{" + "tokenCreator=" + tokenCreator + ", tokenRepository=" + repository + ", lengthOfTimeConverter=" + lengthOfTimeConverter + '}';
     }
 
 }
