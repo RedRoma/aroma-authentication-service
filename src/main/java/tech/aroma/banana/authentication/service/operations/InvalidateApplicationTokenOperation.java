@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2015 Aroma Tech.
  *
@@ -14,22 +15,25 @@
  * limitations under the License.
  */
 
- 
 package tech.aroma.banana.authentication.service.operations;
 
-
+import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.aroma.banana.authentication.service.AuthenticationAssertions;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.authentication.service.InvalidateApplicationTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.InvalidateApplicationTokenResponse;
+import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
+import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
-import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
-import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
+import static tech.aroma.banana.authentication.service.AuthenticationAssertions.checkNotNull;
+import static tech.aroma.banana.authentication.service.AuthenticationAssertions.checkRequestNotNull;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 
 /**
  *
@@ -38,20 +42,50 @@ import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
 @Internal
 final class InvalidateApplicationTokenOperation implements ThriftOperation<InvalidateApplicationTokenRequest, InvalidateApplicationTokenResponse>
 {
+
     private final static Logger LOG = LoggerFactory.getLogger(InvalidateApplicationTokenOperation.class);
-    
-    private TokenRepository repository;
+
+    private final TokenRepository repository;
+
+    @Inject
+    InvalidateApplicationTokenOperation(TokenRepository repository)
+    {
+        checkThat(repository).is(notNull());
+        
+        this.repository = repository;
+    }
 
     @Override
     public InvalidateApplicationTokenResponse process(InvalidateApplicationTokenRequest request) throws TException
     {
-        AuthenticationAssertions.checkRequestNotNull(request);
-        
         LOG.debug("Received request to invalidate token: {}", request);
+
+        checkRequestNotNull(request);
+        checkNotNull(request.token, "request is missing token");
+        checkThat(request.token.tokenId)
+            .throwing(InvalidArgumentException.class)
+            .is(nonEmptyString());
+        String tokenId = request.token.tokenId;
         
-        InvalidateApplicationTokenResponse response = one((pojos(InvalidateApplicationTokenResponse.class)));
+        tryDelete(tokenId);
         
-        return response;
+        return new InvalidateApplicationTokenResponse();
+    }
+
+    private void tryDelete(String tokenId) throws TException
+    {
+        try
+        {
+            repository.deleteToken(tokenId);
+        }
+        catch(TException ex)
+        {
+            throw ex;
+        }
+        catch(Exception ex)
+        {
+            throw new OperationFailedException("Could not delete token");
+        }
     }
 
 }
