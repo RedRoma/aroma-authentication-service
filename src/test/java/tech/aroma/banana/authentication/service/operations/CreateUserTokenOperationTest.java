@@ -93,6 +93,19 @@ public class CreateUserTokenOperationTest
             .getLifetime()
             .setValue(one(longs(1, 1000000)));
     }
+    
+    @Test
+    public void testWithBadConstructorArgs()
+    {
+        assertThrows(() -> new CreateUserTokenOperation(null, tokenRepository, lengthOfTimeConverter))
+            .isInstanceOf(IllegalArgumentException.class);
+        
+        assertThrows(() -> new CreateUserTokenOperation(tokenCreator, null, lengthOfTimeConverter))
+            .isInstanceOf(IllegalArgumentException.class);
+        
+        assertThrows(() -> new CreateUserTokenOperation(tokenCreator, tokenRepository, null))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
 
     @Repeat(500)
     @Test

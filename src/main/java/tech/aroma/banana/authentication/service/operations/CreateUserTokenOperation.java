@@ -38,6 +38,7 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.NumberAssertions.greaterThan;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.stringWithLengthGreaterThan;
@@ -62,6 +63,9 @@ final class CreateUserTokenOperation implements ThriftOperation<CreateUserTokenR
                              TokenRepository tokenRepository,
                              Function<LengthOfTime, Duration> lengthOfTimeConverter)
     {
+        checkThat(tokenCreator, tokenRepository, lengthOfTimeConverter)
+            .are(notNull());
+        
         this.tokenCreator = tokenCreator;
         this.tokenRepository = tokenRepository;
         this.lengthOfTimeConverter = lengthOfTimeConverter;
