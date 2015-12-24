@@ -54,8 +54,8 @@ public final class TcpServer
                                                  new AuthenticationOperationsModule(),
                                                  new AuthenticationServiceModule());
 
-        AuthenticationService.Iface bananaService = injector.getInstance(AuthenticationService.Iface.class);
-        AuthenticationService.Processor processor = new AuthenticationService.Processor<>(bananaService);
+        AuthenticationService.Iface authenticationService = injector.getInstance(AuthenticationService.Iface.class);
+        AuthenticationService.Processor processor = new AuthenticationService.Processor<>(authenticationService);
 
         TServerSocket socket = new TServerSocket(PORT);
         socket.getServerSocket().setSoTimeout((int) SECONDS.toMillis(30));
