@@ -1,5 +1,5 @@
 
-package tech.aroma.banana.authentication.service;
+package tech.aroma.banana.authentication.service.server;
 
 /*
  * Copyright 2015 Aroma Tech.
@@ -28,6 +28,7 @@ import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.aroma.banana.authentication.service.AuthenticationServiceModule;
 import tech.aroma.banana.authentication.service.data.AuthenticationDataModule;
 import tech.aroma.banana.authentication.service.operations.AuthenticationOperationsModule;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;

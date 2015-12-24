@@ -129,7 +129,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>tech.aroma.banana.authentication.service.TcpServer</mainClass>
+                            <mainClass>tech.aroma.banana.authentication.service.server.TcpServer</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
