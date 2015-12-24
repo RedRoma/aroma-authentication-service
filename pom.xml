@@ -5,11 +5,11 @@
     <parent>
         <groupId>tech.aroma.banana</groupId>
         <artifactId>banana</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.2</version>
     </parent>
 
     <artifactId>authentication-service</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <name>${project.artifactId}</name>
     <packaging>jar</packaging>
 
@@ -64,7 +64,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>banana-thrift</artifactId>
-            <version>1.4-SNAPSHOT</version>
+            <version>1.4</version>
         </dependency>
 
         <!--GUICE-->
@@ -103,12 +103,18 @@
             <artifactId>hamcrest-library</artifactId>
         </dependency>
 
+        <!--CASSANDRA-->
+
         <dependency>
             <groupId>tech.sirwellington.alchemy</groupId>
             <artifactId>alchemy-test</artifactId>
         </dependency>
 
-
+        <dependency>
+            <groupId>com.datastax.cassandra</groupId>
+            <artifactId>cassandra-driver-core</artifactId>
+        </dependency>
+     
     </dependencies>
 
     <build>
@@ -123,7 +129,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>tech.aroma.banana.service.server.TcpServer</mainClass>
+                            <mainClass>tech.aroma.banana.authentication.service.TcpServer</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
