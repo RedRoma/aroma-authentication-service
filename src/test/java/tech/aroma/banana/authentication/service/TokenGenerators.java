@@ -21,8 +21,8 @@ package tech.aroma.banana.authentication.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.thrift.authentication.ApplicationToken;
+import tech.aroma.banana.thrift.authentication.AuthenticationToken;
 import tech.aroma.banana.thrift.authentication.UserToken;
-import tech.aroma.banana.thrift.authentication.service.AuthenticationToken;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.generator.AlchemyGenerator;
 

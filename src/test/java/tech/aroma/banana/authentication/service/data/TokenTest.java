@@ -20,9 +20,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.aroma.banana.thrift.authentication.ApplicationToken;
+import tech.aroma.banana.thrift.authentication.AuthenticationToken;
+import tech.aroma.banana.thrift.authentication.TokenType;
 import tech.aroma.banana.thrift.authentication.UserToken;
-import tech.aroma.banana.thrift.authentication.service.AuthenticationToken;
-import tech.aroma.banana.thrift.authentication.service.TokenType;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
@@ -30,8 +30,8 @@ import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static tech.aroma.banana.thrift.authentication.service.TokenType.APPLICATION;
-import static tech.aroma.banana.thrift.authentication.service.TokenType.USER;
+import static tech.aroma.banana.thrift.authentication.TokenType.APPLICATION;
+import static tech.aroma.banana.thrift.authentication.TokenType.USER;
 
 /**
  *

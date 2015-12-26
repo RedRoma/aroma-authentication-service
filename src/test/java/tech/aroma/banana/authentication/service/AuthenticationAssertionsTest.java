@@ -22,8 +22,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
 import tech.aroma.banana.thrift.authentication.ApplicationToken;
+import tech.aroma.banana.thrift.authentication.AuthenticationToken;
 import tech.aroma.banana.thrift.authentication.UserToken;
-import tech.aroma.banana.thrift.authentication.service.AuthenticationToken;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
 import tech.sirwellington.alchemy.arguments.ExceptionMapper;
@@ -42,15 +42,6 @@ import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
 import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
 import static tech.sirwellington.alchemy.generator.StringGenerators.strings;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
-import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
-import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
-import static tech.sirwellington.alchemy.generator.StringGenerators.strings;
-import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
-import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
-import static tech.sirwellington.alchemy.generator.StringGenerators.strings;
-import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
-import static tech.sirwellington.alchemy.generator.StringGenerators.alphabeticString;
-import static tech.sirwellington.alchemy.generator.StringGenerators.strings;
 
 /**
  *

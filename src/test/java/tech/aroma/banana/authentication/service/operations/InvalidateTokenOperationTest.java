@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
-import tech.aroma.banana.thrift.authentication.service.AuthenticationToken;
+import tech.aroma.banana.thrift.authentication.AuthenticationToken;
 import tech.aroma.banana.thrift.authentication.service.InvalidateTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.InvalidateTokenResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;

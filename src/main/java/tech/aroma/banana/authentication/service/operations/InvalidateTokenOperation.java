@@ -22,7 +22,7 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.authentication.service.data.TokenRepository;
-import tech.aroma.banana.thrift.authentication.service.AuthenticationToken;
+import tech.aroma.banana.thrift.authentication.AuthenticationToken;
 import tech.aroma.banana.thrift.authentication.service.InvalidateTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.InvalidateTokenResponse;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;

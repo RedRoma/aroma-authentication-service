@@ -19,14 +19,14 @@ package tech.aroma.banana.authentication.service.data;
 import java.time.Instant;
 import java.util.Objects;
 import tech.aroma.banana.thrift.authentication.ApplicationToken;
+import tech.aroma.banana.thrift.authentication.AuthenticationToken;
+import tech.aroma.banana.thrift.authentication.TokenType;
 import tech.aroma.banana.thrift.authentication.UserToken;
-import tech.aroma.banana.thrift.authentication.service.AuthenticationToken;
-import tech.aroma.banana.thrift.authentication.service.TokenType;
 import tech.sirwellington.alchemy.annotations.concurrency.Mutable;
 import tech.sirwellington.alchemy.annotations.objects.Pojo;
 
-import static tech.aroma.banana.thrift.authentication.service.TokenType.APPLICATION;
-import static tech.aroma.banana.thrift.authentication.service.TokenType.USER;
+import static tech.aroma.banana.thrift.authentication.TokenType.APPLICATION;
+import static tech.aroma.banana.thrift.authentication.TokenType.USER;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
