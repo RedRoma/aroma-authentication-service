@@ -18,7 +18,6 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
-import tech.aroma.banana.thrift.authentication.service.AuthenticationServiceConstants;
 import tech.aroma.banana.thrift.authentication.service.CreateTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.CreateTokenResponse;
 import tech.aroma.banana.thrift.authentication.service.GetTokenInfoRequest;
@@ -29,6 +28,7 @@ import tech.aroma.banana.thrift.authentication.service.VerifyTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.VerifyTokenResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
+import tech.aroma.banana.thrift.service.BananaServiceConstants;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
@@ -72,7 +72,7 @@ final class AuthenticationServiceImpl implements AuthenticationService.Iface
     @Override
     public double getApiVersion() throws TException
     {
-        return AuthenticationServiceConstants.API_VERSION;
+        return BananaServiceConstants.API_VERSION;
     }
 
     @Override
