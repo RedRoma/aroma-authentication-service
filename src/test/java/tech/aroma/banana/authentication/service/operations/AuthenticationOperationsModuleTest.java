@@ -21,7 +21,7 @@ import com.google.inject.Injector;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import tech.aroma.banana.authentication.service.data.AuthenticationDataModule;
+import tech.aroma.banana.authentication.service.data.AuthenticationInMemoryDataModule;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 /**
@@ -31,14 +31,14 @@ import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 @RunWith(AlchemyTestRunner.class)
 public class AuthenticationOperationsModuleTest 
 {
-    private AuthenticationDataModule dataModule;
+    private AuthenticationInMemoryDataModule dataModule;
 
     private AuthenticationOperationsModule module;
     
     @Before
     public void setUp()
     {
-        dataModule = new AuthenticationDataModule();
+        dataModule = new AuthenticationInMemoryDataModule();
         module = new AuthenticationOperationsModule();
     }
 

@@ -31,15 +31,15 @@ import static org.junit.Assert.*;
  * @author SirWellington
  */
 @RunWith(AlchemyTestRunner.class)
-public class AuthenticationDataModuleTest 
+public class AuthenticationInMemoryDataModuleTest 
 {
 
-    private AuthenticationDataModule module;
+    private AuthenticationInMemoryDataModule module;
     
     @Before
     public void setUp()
     {
-        module = new AuthenticationDataModule();
+        module = new AuthenticationInMemoryDataModule();
     }
 
     @Test

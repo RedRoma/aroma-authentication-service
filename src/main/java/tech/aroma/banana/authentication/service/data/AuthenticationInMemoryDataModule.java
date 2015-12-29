@@ -28,9 +28,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author SirWellington
  */
-public final class AuthenticationDataModule extends AbstractModule
+public final class AuthenticationInMemoryDataModule extends AbstractModule
 {
-    private final static Logger LOG = LoggerFactory.getLogger(AuthenticationDataModule.class);
+    private final static Logger LOG = LoggerFactory.getLogger(AuthenticationInMemoryDataModule.class);
 
     @Override
     protected void configure()
