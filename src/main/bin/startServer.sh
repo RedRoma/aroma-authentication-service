@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
-jar="authentication-service.jar"
+version='1.1-SNAPSHOT'
+jar="banana-authentication-service-$version.jar"
 
 nohup java -jar $jar > server.log &
