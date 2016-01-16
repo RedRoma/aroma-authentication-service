@@ -21,7 +21,7 @@ import java.util.List;
 import org.apache.thrift.TException;
 import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
 import tech.sirwellington.alchemy.annotations.arguments.NonEmpty;
-import tech.sirwellington.alchemy.annotations.arguments.NonNull;
+import tech.sirwellington.alchemy.annotations.arguments.Required;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;
 
 import static tech.aroma.banana.authentication.service.AuthenticationAssertions.tokenInRepository;
@@ -50,7 +50,8 @@ public interface TokenRepository
             .are(nonEmptyString());
 
         checkThat(tokenId)
-            .throwing(ex -> new InvalidTokenException("tokenId does not exist in this repository"))
+            .throwing(InvalidTokenException.class)
+            .usingMessage("tokenId does not exist in this repository")
             .is(tokenInRepository(this));
 
         Token token = this.getToken(tokenId);
@@ -60,13 +61,13 @@ public interface TokenRepository
 
     Token getToken(@NonEmpty String tokenId) throws TException, InvalidTokenException;
 
-    void saveToken(@NonNull Token token) throws TException;
+    void saveToken(@Required Token token) throws TException;
 
     List<Token> getTokensBelongingTo(@NonEmpty String ownerId) throws TException;
 
     void deleteToken(@NonEmpty String tokenId) throws TException;
 
-    default void deleteTokens(@NonNull List<String> tokenIds) throws TException
+    default void deleteTokens(@Required List<String> tokenIds) throws TException
     {
         checkThat(tokenIds).is(notNull());
 
