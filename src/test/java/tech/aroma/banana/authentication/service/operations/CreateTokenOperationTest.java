@@ -34,6 +34,7 @@ import tech.aroma.banana.thrift.authentication.service.CreateTokenResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.aroma.banana.thrift.functions.TimeFunctions;
+import tech.sirwellington.alchemy.annotations.testing.TimeSensitive;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
@@ -92,6 +93,7 @@ public class CreateTokenOperationTest
         when(tokenCreator.create()).thenReturn(tokenId);
     }
 
+    @TimeSensitive
     @Repeat(500)
     @Test
     public void testProcess() throws Exception
@@ -115,6 +117,7 @@ public class CreateTokenOperationTest
         Instant expectedTimeOfExpiration = now.plus(lengthOfTimeConverter.apply(request.lifetime));
         Instant timeOfExpiration = savedToken.getTimeOfExpiration();
         Duration timeOfExpirationDelta = Duration.between(timeOfExpiration, expectedTimeOfExpiration).abs();
+        
         assertThat(timeOfExpirationDelta.getSeconds(), lessThan(1L));
     }
     
