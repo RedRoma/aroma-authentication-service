@@ -42,6 +42,9 @@ import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
 import static tech.sirwellington.alchemy.generator.StringGenerators.hexadecimalString;
 import static tech.sirwellington.alchemy.generator.TimeGenerators.futureInstants;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static java.time.Instant.now;
+import static tech.sirwellington.alchemy.generator.CollectionGenerators.listOf;
+import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
 
 /**
  *
@@ -65,7 +68,7 @@ public class TokenRepositoryInMemoryTest
     @Before
     public void setUp()
     {
-        repository = new TokenRepositoryInMemory();
+        repository = new MemoryTokenRepository();
 
         tokenId = token.getTokenId();
         ownerId = token.getOwnerId();

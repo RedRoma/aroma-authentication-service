@@ -33,16 +33,18 @@ import static tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPa
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
+import static java.time.Instant.now;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 
 /**
  *
  * @author SirWellington
  */
 @StrategyPattern(role = CONCRETE_BEHAVIOR)
-final class TokenRepositoryInMemory implements TokenRepository
+final class MemoryTokenRepository implements TokenRepository
 {
 
-    private final static Logger LOG = LoggerFactory.getLogger(TokenRepositoryInMemory.class);
+    private final static Logger LOG = LoggerFactory.getLogger(MemoryTokenRepository.class);
 
     private final Map<String, Token> tokens = Maps.newConcurrentMap();
     private final Map<String, List<Token>> tokensByOwner = Maps.newConcurrentMap();

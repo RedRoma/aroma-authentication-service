@@ -48,7 +48,7 @@ public final class ModuleMemoryAuthenticationData extends AbstractModule
     @Provides
     TokenRepository provideTokenRepository()
     {
-        return new TokenRepositoryInMemory();
+        return new MemoryTokenRepository();
     }
     
 
