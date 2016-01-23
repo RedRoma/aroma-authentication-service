@@ -35,6 +35,10 @@ import static tech.sirwellington.alchemy.generator.StringGenerators.hexadecimalS
 public interface TokenCreator
 {
 
+    /**
+     * Creates a String expected to be unique accross calls and accross machines.
+     * @return 
+     */
     String create();
 
     @StrategyPattern(role = CONCRETE_BEHAVIOR)
