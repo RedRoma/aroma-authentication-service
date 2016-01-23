@@ -116,7 +116,7 @@ public class CreateTokenOperationTest
         long timeOfCreation = savedToken.getTimeOfCreation();
         checkThat(timeOfCreation)
             .throwing(AssertionFailedError.class)
-            .is(epochNowWithinDelta(100));
+            .is(epochNowWithinDelta(2000));
         
         Instant expectedTimeOfExpiration = now.plus(lengthOfTimeConverter.apply(request.lifetime));
         Instant timeOfExpiration = Instant.ofEpochMilli(savedToken.getTimeOfExpiration());
