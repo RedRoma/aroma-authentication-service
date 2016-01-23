@@ -30,9 +30,9 @@ import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
  *
  * @author SirWellington
  */
-public final class AuthenticationServiceModule extends AbstractModule
+public final class ModuleAuthenticationService extends AbstractModule
 {
-    private final static Logger LOG = LoggerFactory.getLogger(AuthenticationServiceModule.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ModuleAuthenticationService.class);
 
     @Override
     protected void configure()

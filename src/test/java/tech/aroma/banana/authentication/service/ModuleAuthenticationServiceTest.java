@@ -35,21 +35,21 @@ import static org.junit.Assert.assertThat;
  * @author SirWellington
  */
 @RunWith(AlchemyTestRunner.class)
-public class AuthenticationServiceModuleTest
+public class ModuleAuthenticationServiceTest
 {
 
     private ModuleMemoryDataRepositories dataModule;
     
     private AuthenticationOperationsModule operationsModule;
 
-    private AuthenticationServiceModule instance;
+    private ModuleAuthenticationService instance;
 
     @Before
     public void setUp()
     {
         dataModule = new ModuleMemoryDataRepositories();
         operationsModule = new AuthenticationOperationsModule();
-        instance = new AuthenticationServiceModule();
+        instance = new ModuleAuthenticationService();
     }
 
     @Test
