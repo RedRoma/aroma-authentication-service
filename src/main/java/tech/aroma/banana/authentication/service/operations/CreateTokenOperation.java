@@ -108,6 +108,8 @@ final class CreateTokenOperation implements ThriftOperation<CreateTokenRequest, 
             .setTokenId(tokenId)
             .setOwnerId(request.ownerId)
             .setOwnerName(request.ownerName)
+            .setOrganizationId(request.organizationId)
+            .setOrganizationName(request.ownerName)
             .setTokenType(request.desiredTokenType)
             .setTimeOfCreation(timeOfCreation.toEpochMilli())
             .setTimeOfExpiration(timeOfExpiration.toEpochMilli());
