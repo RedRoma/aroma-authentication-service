@@ -32,6 +32,7 @@ import tech.aroma.banana.thrift.service.BananaServiceConstants;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
+import static tech.aroma.banana.thrift.assertions.BananaAssertions.checkRequestNotNull;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
@@ -79,7 +80,7 @@ final class AuthenticationServiceImpl implements AuthenticationService.Iface
     public CreateTokenResponse createToken(CreateTokenRequest request) throws OperationFailedException,
                                                                               TException
     {
-        AuthenticationAssertions.checkRequestNotNull(request);
+        checkRequestNotNull(request);
 
         return createTokenOperation.process(request);
     }
@@ -89,7 +90,7 @@ final class AuthenticationServiceImpl implements AuthenticationService.Iface
                                                                                  InvalidTokenException,
                                                                                  TException
     {
-        AuthenticationAssertions.checkRequestNotNull(request);
+        checkRequestNotNull(request);
 
         return getTokenInfoOperation.process(request);
     }
@@ -99,7 +100,7 @@ final class AuthenticationServiceImpl implements AuthenticationService.Iface
                                                                                           InvalidTokenException,
                                                                                           TException
     {
-        AuthenticationAssertions.checkRequestNotNull(request);
+        checkRequestNotNull(request);
 
         return invalidateTokenOperation.process(request);
     }
@@ -109,7 +110,7 @@ final class AuthenticationServiceImpl implements AuthenticationService.Iface
                                                                               InvalidTokenException,
                                                                               TException
     {
-        AuthenticationAssertions.checkRequestNotNull(request);
+        checkRequestNotNull(request);
 
         return verifyTokenOperation.process(request);
     }

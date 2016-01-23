@@ -20,15 +20,13 @@ package tech.aroma.banana.authentication.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.aroma.banana.thrift.authentication.ApplicationToken;
 import tech.aroma.banana.thrift.authentication.AuthenticationToken;
-import tech.aroma.banana.thrift.authentication.UserToken;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.generator.AlchemyGenerator;
 
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
-import static tech.sirwellington.alchemy.generator.NumberGenerators.smallPositiveIntegers;
 import static tech.sirwellington.alchemy.generator.ObjectGenerators.pojos;
+import static tech.sirwellington.alchemy.generator.StringGenerators.uuids;
 
 /**
  *
@@ -44,20 +42,9 @@ public final class TokenGenerators
     {
         return () ->
         {
-            AuthenticationToken token = new AuthenticationToken();
-            
-            int branch = one(smallPositiveIntegers());
-            
-            if (branch % 2 == 0)
-            {
-                ApplicationToken appToken = one(pojos(ApplicationToken.class));
-                token.setApplicationToken(appToken);
-            }
-            else
-            {
-                UserToken userToken = one(pojos(UserToken.class));
-                token.setUserToken(userToken);
-            }
+            AuthenticationToken token = one(pojos(AuthenticationToken.class));
+            String ownerId = one(uuids);
+            token.setOwnerId(ownerId);
             
             return token;
         };

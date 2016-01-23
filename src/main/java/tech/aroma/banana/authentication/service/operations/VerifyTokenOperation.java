@@ -21,7 +21,7 @@ import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.aroma.banana.authentication.service.data.TokenRepository;
+import tech.aroma.banana.data.TokenRepository;
 import tech.aroma.banana.thrift.authentication.service.VerifyTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.VerifyTokenResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
@@ -29,12 +29,12 @@ import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
-import static tech.aroma.banana.authentication.service.AuthenticationAssertions.checkRequestNotNull;
-import static tech.aroma.banana.authentication.service.AuthenticationAssertions.tokenInRepository;
-import static tech.aroma.banana.authentication.service.AuthenticationAssertions.withMessage;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.aroma.banana.data.assertions.AuthenticationAssertions.tokenInRepository;
+import static tech.aroma.banana.thrift.assertions.BananaAssertions.checkRequestNotNull;
+import static tech.aroma.banana.thrift.assertions.BananaAssertions.withMessage;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 
 /**
  *

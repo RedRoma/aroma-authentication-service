@@ -20,13 +20,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import tech.aroma.banana.authentication.service.data.TokenRepository;
+import tech.aroma.banana.data.TokenRepository;
 import tech.aroma.banana.thrift.authentication.AuthenticationToken;
 import tech.aroma.banana.thrift.authentication.service.InvalidateTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.InvalidateTokenResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
-import tech.aroma.banana.thrift.functions.TokenFunctions;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
@@ -54,7 +53,7 @@ public class InvalidateTokenOperationTest
     @GeneratePojo
     private InvalidateTokenRequest request;
     
-    
+    @GeneratePojo
     private AuthenticationToken authenticationToken;
     
     private String tokenId;
@@ -68,7 +67,7 @@ public class InvalidateTokenOperationTest
         verifyZeroInteractions(repository);
 
         authenticationToken = one(authenticationTokens());
-        tokenId = TokenFunctions.extractTokenId(authenticationToken);
+        tokenId = authenticationToken.tokenId;
         
         request.setToken(authenticationToken);
     }
@@ -126,16 +125,11 @@ public class InvalidateTokenOperationTest
     @Test
     public void testWithMissingTokenId() throws Exception
     {
-        if (request.token.isSetApplicationToken())
-        {
-            request.token.getApplicationToken().setTokenId("");
-        }
-        else if (request.token.isSetUserToken())
-        {
-            request.token.getUserToken().setTokenId("");
-        }
+       
+        AuthenticationToken missingTokenId = new AuthenticationToken(authenticationToken);
+        missingTokenId.unsetTokenId();
 
-        assertThrows(() -> instance.process(request))
+        assertThrows(() -> instance.process(new InvalidateTokenRequest(missingTokenId)))
             .isInstanceOf(InvalidArgumentException.class);
     }
 

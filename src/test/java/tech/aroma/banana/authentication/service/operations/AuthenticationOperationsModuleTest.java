@@ -16,13 +16,19 @@
 
 package tech.aroma.banana.authentication.service.operations;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.Provides;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import tech.aroma.banana.authentication.service.data.ModuleMemoryAuthenticationData;
+import tech.aroma.banana.authentication.service.data.TokenCreator;
+import tech.aroma.banana.data.memory.ModuleMemoryDataRepositories;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
+
+import static org.mockito.Mockito.mock;
 
 /**
  *
@@ -31,21 +37,37 @@ import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 @RunWith(AlchemyTestRunner.class)
 public class AuthenticationOperationsModuleTest 
 {
-    private ModuleMemoryAuthenticationData dataModule;
+    private ModuleMemoryDataRepositories dataModule;
 
     private AuthenticationOperationsModule module;
     
     @Before
     public void setUp()
     {
-        dataModule = new ModuleMemoryAuthenticationData();
+        dataModule = new ModuleMemoryDataRepositories();
         module = new AuthenticationOperationsModule();
     }
 
     @Test
     public void testConfigure()
     {
-        Injector injector = Guice.createInjector(dataModule, module);
+        Injector injector = Guice.createInjector(dataModule,
+                                                 module,
+                                                 tokenCreatorModule);
     }
+    
+    private Module tokenCreatorModule = new AbstractModule()
+    {
+        @Override
+        protected void configure()
+        {
+        }
+        
+        @Provides
+        TokenCreator provideTokenCreator()
+        {
+            return mock(TokenCreator.class);
+        }
+    };
 
 }
