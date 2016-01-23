@@ -41,6 +41,7 @@ import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.stringWithLengthGreaterThanOrEqualTo;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.validUUID;
 
 /**
  *
@@ -51,7 +52,7 @@ final class CreateTokenOperation implements ThriftOperation<CreateTokenRequest, 
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(CreateTokenOperation.class);
-    private final static LengthOfTime DEFAULT_LIFETIME = new LengthOfTime(TimeUnit.DAYS, 30);
+    private final static LengthOfTime DEFAULT_LIFETIME = new LengthOfTime(TimeUnit.DAYS, 60);
 
     private final Function<LengthOfTime, Duration> lengthOfTimeConverter;
     private final TokenCreator tokenCreator;
@@ -84,11 +85,14 @@ final class CreateTokenOperation implements ThriftOperation<CreateTokenRequest, 
         checkThat(request.ownerId)
             .throwing(withMessage("bad owner ID"))
             .is(nonEmptyString())
-            .is(stringWithLengthGreaterThanOrEqualTo(3));
+            .usingMessage("ownerId must be >= 3")
+            .is(stringWithLengthGreaterThanOrEqualTo(3))
+            .usingMessage("ownerId must be a UUID type")
+            .is(validUUID());
 
         if (!request.isSetLifetime())
         {
-            LOG.info(" Token Lifetime not set. Defaulting to {}", DEFAULT_LIFETIME);
+            LOG.info("Token Lifetime not set. Defaulting to {}", DEFAULT_LIFETIME);
             request.setLifetime(DEFAULT_LIFETIME);
         }
 
@@ -103,6 +107,7 @@ final class CreateTokenOperation implements ThriftOperation<CreateTokenRequest, 
         AuthenticationToken token = new AuthenticationToken()
             .setTokenId(tokenId)
             .setOwnerId(request.ownerId)
+            .setOwnerName(request.ownerName)
             .setTokenType(request.desiredTokenType)
             .setTimeOfCreation(timeOfCreation.toEpochMilli())
             .setTimeOfExpiration(timeOfExpiration.toEpochMilli());
@@ -113,18 +118,12 @@ final class CreateTokenOperation implements ThriftOperation<CreateTokenRequest, 
         return new CreateTokenResponse().setToken(token);
     }
 
-    @Override
-    public String toString()
-    {
-        return "CreateTokenOperation{" + "lengthOfTimeConverter=" + lengthOfTimeConverter + ", tokenCreator=" + tokenCreator + ", tokenRepository=" + repository + '}';
-    }
-
     private Instant determineExpirationTimeFrom(Instant timeOfCreation, CreateTokenRequest request)
     {
         Duration tokenLifetime = lengthOfTimeConverter.apply(request.lifetime);
 
         Instant expirationTime = timeOfCreation.plus(tokenLifetime);
-        
+
         return expirationTime;
     }
 

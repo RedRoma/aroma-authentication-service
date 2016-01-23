@@ -52,6 +52,7 @@ import static tech.sirwellington.alchemy.arguments.assertions.TimeAssertions.epo
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.longs;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.UUID;
 
 /**
  *
@@ -74,10 +75,10 @@ public class CreateTokenOperationTest
 
     private CreateTokenOperation instance;
     
-    @GenerateString
+    @GenerateString(UUID )
     private String tokenId;
     
-    @GenerateString
+    @GenerateString(UUID)
     private String ownerId;
     
     @Captor
