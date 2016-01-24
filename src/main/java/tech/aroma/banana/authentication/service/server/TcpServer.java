@@ -30,7 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.authentication.service.ModuleAuthenticationService;
 import tech.aroma.banana.authentication.service.operations.ModuleAuthenticationOperations;
-import tech.aroma.banana.data.memory.ModuleMemoryDataRepositories;
+import tech.aroma.banana.data.cassandra.ModuleCassandraDataRepositories;
+import tech.aroma.banana.data.cassandra.ModuleCassandraDevCluster;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationServiceConstants;
 import tech.sirwellington.alchemy.annotations.access.Internal;
@@ -51,9 +52,10 @@ public final class TcpServer
 
     public static void main(String[] args) throws TTransportException, SocketException
     {
-        Injector injector = Guice.createInjector(new ModuleMemoryDataRepositories(),
-                                                 new ModuleAuthenticationOperations(),
-                                                 new ModuleAuthenticationService());
+        Injector injector = Guice.createInjector(new ModuleAuthenticationOperations(),
+                                                 new ModuleAuthenticationService(),
+                                                 new ModuleCassandraDataRepositories(),
+                                                 new ModuleCassandraDevCluster());
 
         AuthenticationService.Iface authenticationService = injector.getInstance(AuthenticationService.Iface.class);
         AuthenticationService.Processor processor = new AuthenticationService.Processor<>(authenticationService);
