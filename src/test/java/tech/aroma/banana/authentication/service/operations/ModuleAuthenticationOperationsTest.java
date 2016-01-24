@@ -37,17 +37,17 @@ import static org.mockito.Mockito.mock;
  */
 @IntegrationTest
 @RunWith(AlchemyTestRunner.class)
-public class AuthenticationOperationsModuleTest 
+public class ModuleAuthenticationOperationsTest 
 {
     private ModuleMemoryDataRepositories dataModule;
 
-    private AuthenticationOperationsModule module;
+    private ModuleAuthenticationOperations module;
     
     @Before
     public void setUp()
     {
         dataModule = new ModuleMemoryDataRepositories();
-        module = new AuthenticationOperationsModule();
+        module = new ModuleAuthenticationOperations();
     }
 
     @Test

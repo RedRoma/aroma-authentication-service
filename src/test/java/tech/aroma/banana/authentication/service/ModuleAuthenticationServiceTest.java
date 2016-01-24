@@ -22,7 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.aroma.banana.authentication.service.data.TokenCreator;
-import tech.aroma.banana.authentication.service.operations.AuthenticationOperationsModule;
+import tech.aroma.banana.authentication.service.operations.ModuleAuthenticationOperations;
 import tech.aroma.banana.data.memory.ModuleMemoryDataRepositories;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
@@ -40,7 +40,7 @@ public class ModuleAuthenticationServiceTest
 
     private ModuleMemoryDataRepositories dataModule;
     
-    private AuthenticationOperationsModule operationsModule;
+    private ModuleAuthenticationOperations operationsModule;
 
     private ModuleAuthenticationService instance;
 
@@ -48,7 +48,7 @@ public class ModuleAuthenticationServiceTest
     public void setUp()
     {
         dataModule = new ModuleMemoryDataRepositories();
-        operationsModule = new AuthenticationOperationsModule();
+        operationsModule = new ModuleAuthenticationOperations();
         instance = new ModuleAuthenticationService();
     }
 
