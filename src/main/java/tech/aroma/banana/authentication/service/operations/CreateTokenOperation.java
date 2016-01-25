@@ -92,7 +92,7 @@ final class CreateTokenOperation implements ThriftOperation<CreateTokenRequest, 
 
         if (!request.isSetLifetime())
         {
-            LOG.info("Token Lifetime not set. Defaulting to {}", DEFAULT_LIFETIME);
+            LOG.debug("Token Lifetime not set. Defaulting to {}", DEFAULT_LIFETIME);
             request.setLifetime(DEFAULT_LIFETIME);
         }
 
