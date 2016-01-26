@@ -32,9 +32,9 @@ import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 import static tech.aroma.banana.data.assertions.AuthenticationAssertions.tokenInRepository;
 import static tech.aroma.banana.thrift.assertions.BananaAssertions.checkRequestNotNull;
 import static tech.aroma.banana.thrift.assertions.BananaAssertions.withMessage;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
-import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 
 /**
  *
@@ -106,15 +106,10 @@ final class VerifyTokenOperation implements ThriftOperation<VerifyTokenRequest, 
         }
         catch (Exception ex)
         {
-            throw new OperationFailedException("Could not read token repository");
+            throw new OperationFailedException("Could not read token repository: " + ex.getMessage());
         }
 
         return match;
     }
 
-    @Override
-    public String toString()
-    {
-        return "VerifyTokenOperation{" + "repository=" + repository + '}';
-    }
 }
