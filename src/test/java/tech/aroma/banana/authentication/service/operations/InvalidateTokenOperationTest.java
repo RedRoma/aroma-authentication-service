@@ -28,6 +28,7 @@ import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
+import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.*;
@@ -38,6 +39,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static tech.aroma.banana.authentication.service.TokenGenerators.authenticationTokens;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.UUID;
 
 /**
  *
@@ -48,28 +50,34 @@ public class InvalidateTokenOperationTest
 {
 
     @Mock
-    private TokenRepository repository;
+    private TokenRepository tokenRepo;
 
     @GeneratePojo
     private InvalidateTokenRequest request;
     
     @GeneratePojo
     private AuthenticationToken authenticationToken;
-    
+
+    @GenerateString(UUID)
     private String tokenId;
+    
+    @GenerateString(UUID)
+    private String ownerId;
 
     private InvalidateTokenOperation instance;
 
     @Before
     public void setUp()
     {
-        instance = new InvalidateTokenOperation(repository);
-        verifyZeroInteractions(repository);
+        instance = new InvalidateTokenOperation(tokenRepo);
+        verifyZeroInteractions(tokenRepo);
 
         authenticationToken = one(authenticationTokens());
-        tokenId = authenticationToken.tokenId;
+        authenticationToken.tokenId = tokenId;
+        authenticationToken.ownerId = ownerId;
         
         request.setToken(authenticationToken);
+        request.unsetBelongingTo();
     }
 
     @Test
@@ -86,7 +94,7 @@ public class InvalidateTokenOperationTest
         InvalidateTokenResponse response = instance.process(request);
         assertThat(response, notNullValue());
 
-        verify(repository).deleteToken(tokenId);
+        verify(tokenRepo).deleteToken(tokenId);
     }
 
     @Test
@@ -100,7 +108,7 @@ public class InvalidateTokenOperationTest
     public void testWhenRepositoryFails() throws Exception
     {
         doThrow(new RuntimeException())
-            .when(repository)
+            .when(tokenRepo)
             .deleteToken(tokenId);
 
         assertThrows(() -> instance.process(request))
@@ -131,6 +139,17 @@ public class InvalidateTokenOperationTest
 
         assertThrows(() -> instance.process(new InvalidateTokenRequest(missingTokenId)))
             .isInstanceOf(InvalidArgumentException.class);
+    }
+    
+    @Test
+    public void testWithDeleteBelongingTo() throws Exception
+    {
+        request.belongingTo = ownerId;
+        
+        InvalidateTokenResponse response = instance.process(request);
+        assertThat(response, notNullValue());
+        
+        verify(tokenRepo).deleteTokensBelongingTo(ownerId);
     }
 
 }
