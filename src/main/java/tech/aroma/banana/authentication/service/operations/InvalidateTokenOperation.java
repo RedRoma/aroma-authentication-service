@@ -63,10 +63,6 @@ final class InvalidateTokenOperation implements ThriftOperation<InvalidateTokenR
         LOG.debug("Received request to invalidate token: {}", request);
 
         checkRequestNotNull(request);
-        checkThat(request.token)
-            .throwing(withMessage("request is missing token"))
-            .is(notNull())
-            .is(legalToken());
 
         if (request.isSetBelongingTo())
         {
@@ -82,6 +78,11 @@ final class InvalidateTokenOperation implements ThriftOperation<InvalidateTokenR
         }
         else
         {
+            checkThat(request.token)
+                .throwing(withMessage("request is missing token"))
+                .is(notNull())
+                .is(legalToken());
+
             deleteToken(request.token);
         }
 

@@ -145,6 +145,8 @@ public class InvalidateTokenOperationTest
     public void testWithDeleteBelongingTo() throws Exception
     {
         request.belongingTo = ownerId;
+        request.unsetToken();
+        request.unsetMultipleTokens();
         
         InvalidateTokenResponse response = instance.process(request);
         assertThat(response, notNullValue());
