@@ -26,6 +26,7 @@ import tech.aroma.banana.thrift.authentication.service.InvalidateTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.InvalidateTokenResponse;
 import tech.aroma.banana.thrift.authentication.service.VerifyTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.VerifyTokenResponse;
+import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.aroma.banana.thrift.service.BananaServiceConstants;
@@ -78,6 +79,7 @@ final class AuthenticationServiceImpl implements AuthenticationService.Iface
 
     @Override
     public CreateTokenResponse createToken(CreateTokenRequest request) throws OperationFailedException,
+                                                                              InvalidArgumentException,
                                                                               TException
     {
         checkRequestNotNull(request);
@@ -87,6 +89,7 @@ final class AuthenticationServiceImpl implements AuthenticationService.Iface
 
     @Override
     public GetTokenInfoResponse getTokenInfo(GetTokenInfoRequest request) throws OperationFailedException,
+                                                                                 InvalidArgumentException,
                                                                                  InvalidTokenException,
                                                                                  TException
     {
@@ -97,6 +100,7 @@ final class AuthenticationServiceImpl implements AuthenticationService.Iface
 
     @Override
     public InvalidateTokenResponse invalidateToken(InvalidateTokenRequest request) throws OperationFailedException,
+                                                                                          InvalidArgumentException,
                                                                                           InvalidTokenException,
                                                                                           TException
     {
@@ -107,6 +111,7 @@ final class AuthenticationServiceImpl implements AuthenticationService.Iface
 
     @Override
     public VerifyTokenResponse verifyToken(VerifyTokenRequest request) throws OperationFailedException,
+                                                                              InvalidArgumentException,
                                                                               InvalidTokenException,
                                                                               TException
     {
