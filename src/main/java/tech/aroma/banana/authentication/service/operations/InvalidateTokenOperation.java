@@ -79,8 +79,8 @@ final class InvalidateTokenOperation implements ThriftOperation<InvalidateTokenR
         else
         {
             checkThat(request.token)
-                .throwing(withMessage("request is missing token"))
-                .is(notNull())
+                .throwing(InvalidArgumentException.class)
+                .usingMessage("request is missing token")
                 .is(legalToken());
 
             deleteToken(request.token);
