@@ -20,16 +20,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import tech.aroma.banana.thrift.authentication.AuthenticationToken;
-import tech.aroma.banana.thrift.authentication.service.CreateTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.CreateTokenResponse;
-import tech.aroma.banana.thrift.authentication.service.GetTokenInfoRequest;
-import tech.aroma.banana.thrift.authentication.service.GetTokenInfoResponse;
-import tech.aroma.banana.thrift.authentication.service.InvalidateTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.InvalidateTokenResponse;
-import tech.aroma.banana.thrift.authentication.service.VerifyTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.VerifyTokenResponse;
-import tech.aroma.banana.thrift.service.BananaServiceConstants;
+import tech.aroma.thrift.authentication.AuthenticationToken;
+import tech.aroma.thrift.authentication.service.CreateTokenRequest;
+import tech.aroma.thrift.authentication.service.CreateTokenResponse;
+import tech.aroma.thrift.authentication.service.GetTokenInfoRequest;
+import tech.aroma.thrift.authentication.service.GetTokenInfoResponse;
+import tech.aroma.thrift.authentication.service.InvalidateTokenRequest;
+import tech.aroma.thrift.authentication.service.InvalidateTokenResponse;
+import tech.aroma.thrift.authentication.service.VerifyTokenRequest;
+import tech.aroma.thrift.authentication.service.VerifyTokenResponse;
+import tech.aroma.thrift.service.AromaServiceConstants;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
@@ -143,7 +143,7 @@ public class AuthenticationServiceImplTest
     public void testGetApiVersion() throws Exception
     {
         double response = instance.getApiVersion();
-        assertThat(response, is(BananaServiceConstants.API_VERSION));
+        assertThat(response, is(AromaServiceConstants.API_VERSION));
 
     }
 

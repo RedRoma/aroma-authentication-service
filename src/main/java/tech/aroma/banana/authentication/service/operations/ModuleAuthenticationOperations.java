@@ -25,16 +25,16 @@ import java.time.Duration;
 import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.aroma.banana.thrift.LengthOfTime;
-import tech.aroma.banana.thrift.authentication.service.CreateTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.CreateTokenResponse;
-import tech.aroma.banana.thrift.authentication.service.GetTokenInfoRequest;
-import tech.aroma.banana.thrift.authentication.service.GetTokenInfoResponse;
-import tech.aroma.banana.thrift.authentication.service.InvalidateTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.InvalidateTokenResponse;
-import tech.aroma.banana.thrift.authentication.service.VerifyTokenRequest;
-import tech.aroma.banana.thrift.authentication.service.VerifyTokenResponse;
-import tech.aroma.banana.thrift.functions.TimeFunctions;
+import tech.aroma.thrift.LengthOfTime;
+import tech.aroma.thrift.authentication.service.CreateTokenRequest;
+import tech.aroma.thrift.authentication.service.CreateTokenResponse;
+import tech.aroma.thrift.authentication.service.GetTokenInfoRequest;
+import tech.aroma.thrift.authentication.service.GetTokenInfoResponse;
+import tech.aroma.thrift.authentication.service.InvalidateTokenRequest;
+import tech.aroma.thrift.authentication.service.InvalidateTokenResponse;
+import tech.aroma.thrift.authentication.service.VerifyTokenRequest;
+import tech.aroma.thrift.authentication.service.VerifyTokenResponse;
+import tech.aroma.thrift.functions.TimeFunctions;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
 /**

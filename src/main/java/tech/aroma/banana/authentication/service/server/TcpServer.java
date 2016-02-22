@@ -30,10 +30,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.authentication.service.ModuleAuthenticationService;
 import tech.aroma.banana.authentication.service.operations.ModuleAuthenticationOperations;
-import tech.aroma.banana.data.cassandra.ModuleCassandraDataRepositories;
-import tech.aroma.banana.data.cassandra.ModuleCassandraDevCluster;
-import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
-import tech.aroma.banana.thrift.authentication.service.AuthenticationServiceConstants;
+import tech.aroma.data.cassandra.ModuleCassandraDataRepositories;
+import tech.aroma.data.cassandra.ModuleCassandraDevCluster;
+import tech.aroma.thrift.authentication.service.AuthenticationService;
+import tech.aroma.thrift.authentication.service.AuthenticationServiceConstants;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 
 import static java.util.concurrent.TimeUnit.SECONDS;

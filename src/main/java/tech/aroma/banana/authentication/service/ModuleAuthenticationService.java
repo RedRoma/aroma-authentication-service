@@ -24,7 +24,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.authentication.service.data.TokenCreator;
-import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
+import tech.aroma.thrift.authentication.service.AuthenticationService;
 
 /**
  *

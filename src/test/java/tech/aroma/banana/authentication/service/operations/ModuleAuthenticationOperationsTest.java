@@ -25,7 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.aroma.banana.authentication.service.data.TokenCreator;
-import tech.aroma.banana.data.memory.ModuleMemoryDataRepositories;
+import tech.aroma.data.memory.ModuleMemoryDataRepositories;
 import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 

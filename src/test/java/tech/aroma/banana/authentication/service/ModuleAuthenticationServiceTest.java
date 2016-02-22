@@ -23,8 +23,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.aroma.banana.authentication.service.data.TokenCreator;
 import tech.aroma.banana.authentication.service.operations.ModuleAuthenticationOperations;
-import tech.aroma.banana.data.memory.ModuleMemoryDataRepositories;
-import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
+import tech.aroma.data.memory.ModuleMemoryDataRepositories;
+import tech.aroma.thrift.authentication.service.AuthenticationService;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
 import static org.hamcrest.Matchers.notNullValue;
