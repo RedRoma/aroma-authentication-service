@@ -21,8 +21,9 @@ import com.google.inject.Injector;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import tech.aroma.banana.authentication.service.data.AuthenticationDataModule;
-import tech.aroma.banana.authentication.service.operations.AuthenticationOperationsModule;
+import tech.aroma.banana.authentication.service.data.TokenCreator;
+import tech.aroma.banana.authentication.service.operations.ModuleAuthenticationOperations;
+import tech.aroma.banana.data.memory.ModuleMemoryDataRepositories;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 
@@ -34,20 +35,21 @@ import static org.junit.Assert.assertThat;
  * @author SirWellington
  */
 @RunWith(AlchemyTestRunner.class)
-public class AuthenticationServiceModuleTest
+public class ModuleAuthenticationServiceTest
 {
-    private AuthenticationDataModule dataModule;
 
-    private AuthenticationOperationsModule operationsModule;
+    private ModuleMemoryDataRepositories dataModule;
+    
+    private ModuleAuthenticationOperations operationsModule;
 
-    private AuthenticationServiceModule module;
+    private ModuleAuthenticationService instance;
 
     @Before
     public void setUp()
     {
-        dataModule = new AuthenticationDataModule();
-        operationsModule = new AuthenticationOperationsModule();
-        module = new AuthenticationServiceModule();
+        dataModule = new ModuleMemoryDataRepositories();
+        operationsModule = new ModuleAuthenticationOperations();
+        instance = new ModuleAuthenticationService();
     }
 
     @Test
@@ -55,10 +57,17 @@ public class AuthenticationServiceModuleTest
     {
         Injector injector = Guice.createInjector(dataModule, 
                                                  operationsModule, 
-                                                 module);
+                                                 instance);
         
         AuthenticationService.Iface service = injector.getInstance(AuthenticationService.Iface.class);
         assertThat(service, notNullValue());
+    }
+
+    @Test
+    public void testProvideTokenCreator()
+    {
+        TokenCreator tokenCreator = instance.provideTokenCreator();
+        assertThat(tokenCreator, notNullValue());
     }
 
 }

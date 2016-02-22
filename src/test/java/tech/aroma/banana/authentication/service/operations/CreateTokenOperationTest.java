@@ -19,21 +19,23 @@ package tech.aroma.banana.authentication.service.operations;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Function;
+import junit.framework.AssertionFailedError;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import tech.aroma.banana.authentication.service.data.Token;
 import tech.aroma.banana.authentication.service.data.TokenCreator;
-import tech.aroma.banana.authentication.service.data.TokenRepository;
+import tech.aroma.banana.data.TokenRepository;
 import tech.aroma.banana.thrift.LengthOfTime;
+import tech.aroma.banana.thrift.authentication.AuthenticationToken;
 import tech.aroma.banana.thrift.authentication.service.CreateTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.CreateTokenResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.aroma.banana.thrift.functions.TimeFunctions;
+import tech.sirwellington.alchemy.annotations.testing.TimeSensitive;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
@@ -45,9 +47,12 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.TimeAssertions.epochNowWithinDelta;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.generator.NumberGenerators.longs;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.UUID;
 
 /**
  *
@@ -70,14 +75,14 @@ public class CreateTokenOperationTest
 
     private CreateTokenOperation instance;
     
-    @GenerateString
+    @GenerateString(UUID )
     private String tokenId;
     
-    @GenerateString
+    @GenerateString(UUID)
     private String ownerId;
     
     @Captor
-    private ArgumentCaptor<Token> tokenCaptor;
+    private ArgumentCaptor<AuthenticationToken> tokenCaptor;
     
     
     @Before
@@ -92,6 +97,7 @@ public class CreateTokenOperationTest
         when(tokenCreator.create()).thenReturn(tokenId);
     }
 
+    @TimeSensitive
     @Repeat(500)
     @Test
     public void testProcess() throws Exception
@@ -103,18 +109,21 @@ public class CreateTokenOperationTest
         
         verify(repository).saveToken(tokenCaptor.capture());
         
-        Token savedToken = tokenCaptor.getValue();
+        AuthenticationToken savedToken = tokenCaptor.getValue();
         assertThat(savedToken, notNullValue());
         assertThat(savedToken.getTokenId(), is(tokenId));
         assertThat(savedToken.getOwnerId(), is(ownerId));
         
-        Instant timeOfCreation = savedToken.getTimeOfCreation();
-        Duration timeOfCreationDelta = Duration.between(now, timeOfCreation).abs();
-        assertThat(timeOfCreationDelta.getSeconds(), lessThanOrEqualTo(1L));
+        long timeOfCreation = savedToken.getTimeOfCreation();
+        checkThat(timeOfCreation)
+            .throwing(AssertionFailedError.class)
+            .usingMessage("token timeOfCreation is off: " + Instant.ofEpochSecond(timeOfCreation))
+            .is(epochNowWithinDelta(2000));
         
         Instant expectedTimeOfExpiration = now.plus(lengthOfTimeConverter.apply(request.lifetime));
-        Instant timeOfExpiration = savedToken.getTimeOfExpiration();
+        Instant timeOfExpiration = Instant.ofEpochMilli(savedToken.getTimeOfExpiration());
         Duration timeOfExpirationDelta = Duration.between(timeOfExpiration, expectedTimeOfExpiration).abs();
+        
         assertThat(timeOfExpirationDelta.getSeconds(), lessThan(1L));
     }
     

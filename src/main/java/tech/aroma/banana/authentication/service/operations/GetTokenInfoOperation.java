@@ -20,18 +20,17 @@ import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.aroma.banana.authentication.service.data.Token;
-import tech.aroma.banana.authentication.service.data.TokenRepository;
+import tech.aroma.banana.data.TokenRepository;
+import tech.aroma.banana.thrift.authentication.AuthenticationToken;
 import tech.aroma.banana.thrift.authentication.service.GetTokenInfoRequest;
 import tech.aroma.banana.thrift.authentication.service.GetTokenInfoResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
-import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
-import static tech.aroma.banana.authentication.service.AuthenticationAssertions.checkRequestNotNull;
-import static tech.aroma.banana.authentication.service.AuthenticationAssertions.withMessage;
+import static tech.aroma.banana.thrift.assertions.BananaAssertions.checkRequestNotNull;
+import static tech.aroma.banana.thrift.assertions.BananaAssertions.withMessage;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
@@ -66,30 +65,26 @@ final class GetTokenInfoOperation implements ThriftOperation<GetTokenInfoRequest
         String tokenId = request.tokenId;
 
         checkThat(tokenId)
-            .throwing(ex -> new InvalidArgumentException("tokenId and id are required"))
+            .throwing(InvalidArgumentException.class)
+            .usingMessage("tokenId is required")
             .is(nonEmptyString());
 
         checkThat(request.tokenType)
             .throwing(withMessage("token type is required"))
             .is(notNull());
 
-        Token token = tryGetToken(tokenId);
+        AuthenticationToken token = tryGetToken(tokenId);
         
-        return new GetTokenInfoResponse()
-            .setToken(token.asAuthenticationToken());
+        return new GetTokenInfoResponse().setToken(token);
     }
 
-    private Token tryGetToken(String tokenId) throws TException
+    private AuthenticationToken tryGetToken(String tokenId) throws TException
     {
-        Token token;
+        AuthenticationToken token;
 
         try
         {
             token = tokenRepository.getToken(tokenId);
-        }
-        catch (IllegalArgumentException ex)
-        {
-            throw new InvalidTokenException();
         }
         catch (Exception ex)
         {
@@ -101,12 +96,6 @@ final class GetTokenInfoOperation implements ThriftOperation<GetTokenInfoRequest
             .is(notNull());
 
         return token;
-    }
-
-    @Override
-    public String toString()
-    {
-        return "GetTokenInfoOperation{" + "tokenRepository=" + tokenRepository + '}';
     }
 
 }

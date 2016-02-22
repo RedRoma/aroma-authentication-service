@@ -1,9 +1,9 @@
 Authentication Service
 ==============================================
 
-[<img src="https://raw.githubusercontent.com/AromaTech/banana/develop/Graphics/Logo.png" width="300">](https://github.com/AromaTech/banana)
+[<img src="https://raw.githubusercontent.com/RedRoma/Aroma/develop/Graphics/Logo.png" width="300">](https://github.com/RedRoma/Aroma)
 
-[![Build Status](http://jenkins.sirwellington.tech/buildStatus/icon?job=Application Service)](http://jenkins.sirwellington.tech/view/Banana/job/Application%20Service/)
+[![Build Status](http://jenkins.sirwellington.tech/view/Aroma/job/Authentication%20Service/badge/icon)](http://jenkins.sirwellington.tech/view/Aroma/job/Authentication%20Service/)
 
 The Authentication Service specializes in the Creation and Verification of Tokens.
 This includes Application Tokens and User Tokens.
@@ -19,6 +19,8 @@ This project builds with maven. Just run a `mvn clean install` to compile and in
 + Maven
 
 # Release Notes
+## 1.1
+This 1.1 release persists token to a Cassandra Table.
 
 ## 1.0
 The 1.0 is a pre-release of the Authentication Service. The interface and main operations have been fleshed out,

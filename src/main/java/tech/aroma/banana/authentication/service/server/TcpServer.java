@@ -1,5 +1,5 @@
 
-package tech.aroma.banana.authentication.service;
+package tech.aroma.banana.authentication.service.server;
 
 /*
  * Copyright 2015 Aroma Tech.
@@ -28,8 +28,10 @@ import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.aroma.banana.authentication.service.data.AuthenticationDataModule;
-import tech.aroma.banana.authentication.service.operations.AuthenticationOperationsModule;
+import tech.aroma.banana.authentication.service.ModuleAuthenticationService;
+import tech.aroma.banana.authentication.service.operations.ModuleAuthenticationOperations;
+import tech.aroma.banana.data.cassandra.ModuleCassandraDataRepositories;
+import tech.aroma.banana.data.cassandra.ModuleCassandraDevCluster;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationServiceConstants;
 import tech.sirwellington.alchemy.annotations.access.Internal;
@@ -50,12 +52,13 @@ public final class TcpServer
 
     public static void main(String[] args) throws TTransportException, SocketException
     {
-        Injector injector = Guice.createInjector(new AuthenticationDataModule(),
-                                                 new AuthenticationOperationsModule(),
-                                                 new AuthenticationServiceModule());
+        Injector injector = Guice.createInjector(new ModuleAuthenticationOperations(),
+                                                 new ModuleAuthenticationService(),
+                                                 new ModuleCassandraDataRepositories(),
+                                                 new ModuleCassandraDevCluster());
 
-        AuthenticationService.Iface bananaService = injector.getInstance(AuthenticationService.Iface.class);
-        AuthenticationService.Processor processor = new AuthenticationService.Processor<>(bananaService);
+        AuthenticationService.Iface authenticationService = injector.getInstance(AuthenticationService.Iface.class);
+        AuthenticationService.Processor processor = new AuthenticationService.Processor<>(authenticationService);
 
         TServerSocket socket = new TServerSocket(PORT);
         socket.getServerSocket().setSoTimeout((int) SECONDS.toMillis(30));

@@ -20,8 +20,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import tech.aroma.banana.authentication.service.data.Token;
-import tech.aroma.banana.authentication.service.data.TokenRepository;
+import tech.aroma.banana.data.TokenRepository;
+import tech.aroma.banana.thrift.authentication.AuthenticationToken;
 import tech.aroma.banana.thrift.authentication.service.GetTokenInfoRequest;
 import tech.aroma.banana.thrift.authentication.service.GetTokenInfoResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
@@ -50,7 +50,7 @@ public class GetTokenInfoOperationTest
     private GetTokenInfoRequest request;
     
     @GeneratePojo
-    private Token token;
+    private AuthenticationToken token;
     
     private GetTokenInfoOperation instance;
     
@@ -72,7 +72,7 @@ public class GetTokenInfoOperationTest
     {
         GetTokenInfoResponse response = instance.process(request);
         assertThat(response, notNullValue());
-        assertThat(response.token, is(token.asAuthenticationToken()));
+        assertThat(response.token, is(token));
     }
     
     @Test

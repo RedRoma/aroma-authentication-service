@@ -19,23 +19,32 @@ package tech.aroma.banana.authentication.service;
 
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.aroma.banana.authentication.service.data.TokenCreator;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
 
 /**
  *
  * @author SirWellington
  */
-public final class AuthenticationServiceModule extends AbstractModule
+public final class ModuleAuthenticationService extends AbstractModule
 {
-    private final static Logger LOG = LoggerFactory.getLogger(AuthenticationServiceModule.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ModuleAuthenticationService.class);
 
     @Override
     protected void configure()
     {
         bind(AuthenticationService.Iface.class).to(AuthenticationServiceImpl.class).in(Singleton.class);
+    }
+    
+    @Singleton
+    @Provides
+    TokenCreator provideTokenCreator()
+    {
+        return TokenCreator.UUID;
     }
 
 }

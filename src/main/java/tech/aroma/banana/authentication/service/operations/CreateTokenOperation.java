@@ -23,11 +23,11 @@ import javax.inject.Inject;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.aroma.banana.authentication.service.data.Token;
 import tech.aroma.banana.authentication.service.data.TokenCreator;
-import tech.aroma.banana.authentication.service.data.TokenRepository;
+import tech.aroma.banana.data.TokenRepository;
 import tech.aroma.banana.thrift.LengthOfTime;
 import tech.aroma.banana.thrift.TimeUnit;
+import tech.aroma.banana.thrift.authentication.AuthenticationToken;
 import tech.aroma.banana.thrift.authentication.service.CreateTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.CreateTokenResponse;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
@@ -35,12 +35,13 @@ import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
 import static java.time.Instant.now;
-import static tech.aroma.banana.authentication.service.AuthenticationAssertions.checkRequestNotNull;
-import static tech.aroma.banana.authentication.service.AuthenticationAssertions.withMessage;
+import static tech.aroma.banana.thrift.assertions.BananaAssertions.checkRequestNotNull;
+import static tech.aroma.banana.thrift.assertions.BananaAssertions.withMessage;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.stringWithLengthGreaterThanOrEqualTo;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.validUUID;
 
 /**
  *
@@ -51,7 +52,7 @@ final class CreateTokenOperation implements ThriftOperation<CreateTokenRequest, 
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(CreateTokenOperation.class);
-    private final static LengthOfTime DEFAULT_LIFETIME = new LengthOfTime(TimeUnit.DAYS, 30);
+    private final static LengthOfTime DEFAULT_LIFETIME = new LengthOfTime(TimeUnit.DAYS, 60);
 
     private final Function<LengthOfTime, Duration> lengthOfTimeConverter;
     private final TokenCreator tokenCreator;
@@ -59,8 +60,8 @@ final class CreateTokenOperation implements ThriftOperation<CreateTokenRequest, 
 
     @Inject
     CreateTokenOperation(Function<LengthOfTime, Duration> lengthOfTimeConverter,
-                                    TokenCreator tokenCreator,
-                                    TokenRepository repository)
+                         TokenCreator tokenCreator,
+                         TokenRepository repository)
     {
         checkThat(lengthOfTimeConverter, tokenCreator, repository)
             .are(notNull());
@@ -76,49 +77,56 @@ final class CreateTokenOperation implements ThriftOperation<CreateTokenRequest, 
         LOG.debug("Received request to create an  Token: {}", request);
 
         checkRequestNotNull(request);
-        
+
         checkThat(request.desiredTokenType)
             .throwing(withMessage("Token Type is required"))
             .is(notNull());
-        
+
         checkThat(request.ownerId)
             .throwing(withMessage("bad owner ID"))
             .is(nonEmptyString())
-            .is(stringWithLengthGreaterThanOrEqualTo(3));
-        
+            .usingMessage("ownerId must be >= 3")
+            .is(stringWithLengthGreaterThanOrEqualTo(3))
+            .usingMessage("ownerId must be a UUID type")
+            .is(validUUID());
+
         if (!request.isSetLifetime())
         {
-            LOG.info(" Token Lifetime not set. Defaulting to {}", DEFAULT_LIFETIME);
+            LOG.debug("Token Lifetime not set. Defaulting to {}", DEFAULT_LIFETIME);
             request.setLifetime(DEFAULT_LIFETIME);
         }
-        
+
         String tokenId = tokenCreator.create();
         Instant timeOfCreation = now();
         checkThat(tokenId)
             .throwing(OperationFailedException.class)
             .is(nonEmptyString());
 
-        Token token = new Token();
-        token.setTokenId(tokenId);
-        token.setOwnerId(request.ownerId);
-        token.setTimeOfCreation(timeOfCreation);
-        token.setTokenType(request.desiredTokenType);
-        
-        Duration tokenLifetime = lengthOfTimeConverter.apply(request.lifetime);
-        Instant timeOfExpiration = timeOfCreation.plus(tokenLifetime);
-        token.setTimeOfExpiration(timeOfExpiration);
-        
+        Instant timeOfExpiration = determineExpirationTimeFrom(timeOfCreation, request);
+
+        AuthenticationToken token = new AuthenticationToken()
+            .setTokenId(tokenId)
+            .setOwnerId(request.ownerId)
+            .setOwnerName(request.ownerName)
+            .setOrganizationId(request.organizationId)
+            .setOrganizationName(request.ownerName)
+            .setTokenType(request.desiredTokenType)
+            .setTimeOfCreation(timeOfCreation.toEpochMilli())
+            .setTimeOfExpiration(timeOfExpiration.toEpochMilli());
+
         repository.saveToken(token);
         LOG.debug("Saved token to repository: {}", token);
-        
-        return new CreateTokenResponse()
-            .setToken(token.asAuthenticationToken());
+
+        return new CreateTokenResponse().setToken(token);
     }
-    
-    @Override
-    public String toString()
+
+    private Instant determineExpirationTimeFrom(Instant timeOfCreation, CreateTokenRequest request)
     {
-        return "CreateTokenOperation{" + "lengthOfTimeConverter=" + lengthOfTimeConverter + ", tokenCreator=" + tokenCreator + ", tokenRepository=" + repository + '}';
+        Duration tokenLifetime = lengthOfTimeConverter.apply(request.lifetime);
+
+        Instant expirationTime = timeOfCreation.plus(tokenLifetime);
+
+        return expirationTime;
     }
-    
+
 }

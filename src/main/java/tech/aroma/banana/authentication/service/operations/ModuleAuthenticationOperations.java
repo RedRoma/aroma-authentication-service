@@ -41,9 +41,9 @@ import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
  *
  * @author SirWellington
  */
-public final class AuthenticationOperationsModule extends AbstractModule
+public final class ModuleAuthenticationOperations extends AbstractModule
 {
-    private final static Logger LOG = LoggerFactory.getLogger(AuthenticationOperationsModule.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ModuleAuthenticationOperations.class);
 
     @Override
     protected void configure()

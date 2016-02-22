@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import tech.aroma.banana.authentication.service.data.TokenRepository;
+import tech.aroma.banana.data.TokenRepository;
 import tech.aroma.banana.thrift.authentication.service.VerifyTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.VerifyTokenResponse;
 import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
@@ -69,7 +69,7 @@ public class VerifyTokenOperationTest
         tokenId = request.tokenId;
         ownerId = request.ownerId;
         
-        when(repository.doesTokenExist(tokenId)).thenReturn(true);
+        when(repository.containsToken(tokenId)).thenReturn(true);
         when(repository.doesTokenBelongTo(tokenId, ownerId)).thenReturn(true);
     }
 
@@ -97,7 +97,7 @@ public class VerifyTokenOperationTest
         VerifyTokenResponse response = instance.process(request);
         assertThat(response, notNullValue());
         
-        verify(repository).doesTokenExist(tokenId);
+        verify(repository).containsToken(tokenId);
         verify(repository, never()).doesTokenBelongTo(eq(tokenId), Mockito.any());
     }
     
@@ -116,7 +116,7 @@ public class VerifyTokenOperationTest
     @Test
     public void testWhenTokenDoesNotExist() throws Exception
     {
-        when(repository.doesTokenExist(tokenId))
+        when(repository.containsToken(tokenId))
             .thenReturn(false);
 
         request.unsetOwnerId();

@@ -18,7 +18,6 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.banana.thrift.authentication.service.AuthenticationService;
-import tech.aroma.banana.thrift.authentication.service.AuthenticationServiceConstants;
 import tech.aroma.banana.thrift.authentication.service.CreateTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.CreateTokenResponse;
 import tech.aroma.banana.thrift.authentication.service.GetTokenInfoRequest;
@@ -27,11 +26,14 @@ import tech.aroma.banana.thrift.authentication.service.InvalidateTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.InvalidateTokenResponse;
 import tech.aroma.banana.thrift.authentication.service.VerifyTokenRequest;
 import tech.aroma.banana.thrift.authentication.service.VerifyTokenResponse;
+import tech.aroma.banana.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.banana.thrift.exceptions.InvalidTokenException;
 import tech.aroma.banana.thrift.exceptions.OperationFailedException;
+import tech.aroma.banana.thrift.service.BananaServiceConstants;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
+import static tech.aroma.banana.thrift.assertions.BananaAssertions.checkRequestNotNull;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 
@@ -72,44 +74,48 @@ final class AuthenticationServiceImpl implements AuthenticationService.Iface
     @Override
     public double getApiVersion() throws TException
     {
-        return AuthenticationServiceConstants.API_VERSION;
+        return BananaServiceConstants.API_VERSION;
     }
 
     @Override
     public CreateTokenResponse createToken(CreateTokenRequest request) throws OperationFailedException,
+                                                                              InvalidArgumentException,
                                                                               TException
     {
-        AuthenticationAssertions.checkRequestNotNull(request);
+        checkRequestNotNull(request);
 
         return createTokenOperation.process(request);
     }
 
     @Override
     public GetTokenInfoResponse getTokenInfo(GetTokenInfoRequest request) throws OperationFailedException,
+                                                                                 InvalidArgumentException,
                                                                                  InvalidTokenException,
                                                                                  TException
     {
-        AuthenticationAssertions.checkRequestNotNull(request);
+        checkRequestNotNull(request);
 
         return getTokenInfoOperation.process(request);
     }
 
     @Override
     public InvalidateTokenResponse invalidateToken(InvalidateTokenRequest request) throws OperationFailedException,
+                                                                                          InvalidArgumentException,
                                                                                           InvalidTokenException,
                                                                                           TException
     {
-        AuthenticationAssertions.checkRequestNotNull(request);
+        checkRequestNotNull(request);
 
         return invalidateTokenOperation.process(request);
     }
 
     @Override
     public VerifyTokenResponse verifyToken(VerifyTokenRequest request) throws OperationFailedException,
+                                                                              InvalidArgumentException,
                                                                               InvalidTokenException,
                                                                               TException
     {
-        AuthenticationAssertions.checkRequestNotNull(request);
+        checkRequestNotNull(request);
 
         return verifyTokenOperation.process(request);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Aroma Tech.
+ * Copyright 2016 Aroma Tech.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,50 +16,50 @@
 
 package tech.aroma.banana.authentication.service.data;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import junit.framework.AssertionFailedError;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
+import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
+import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.validUUID;
 
 /**
  *
  * @author SirWellington
  */
+@Repeat(10)
 @RunWith(AlchemyTestRunner.class)
-public class AuthenticationDataModuleTest 
+public class TokenCreatorTest 
 {
 
-    private AuthenticationDataModule module;
-    
     @Before
     public void setUp()
     {
-        module = new AuthenticationDataModule();
     }
 
     @Test
-    public void testConfigure()
+    public void testUuid()
     {
-        Injector injector = Guice.createInjector(module);
+        String tokenId = TokenCreator.UUID.create();
+        
+        checkThat(tokenId)
+            .throwing(AssertionFailedError.class)
+            .is(validUUID());
+    }
+    
+    @Test
+    public void testUuidPlusHex()
+    {
+        String tokenId = TokenCreator.UUID_PLUS_HEX.create();
+        
+        checkThat(tokenId)
+            .throwing(AssertionFailedError.class)
+            .is(nonEmptyString());
     }
 
-    @Test
-    public void testProvideTokenCreator()
-    {
-        TokenCreator result = module.provideTokenCreator();
-        assertThat(result, notNullValue());
-    }
-
-    @Test
-    public void testProvideTokenRepository()
-    {
-        TokenRepository result = module.provideTokenRepository();
-        assertThat(result, notNullValue());
-    }
 
 }

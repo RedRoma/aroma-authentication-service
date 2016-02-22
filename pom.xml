@@ -5,15 +5,15 @@
     <parent>
         <groupId>tech.aroma.banana</groupId>
         <artifactId>banana</artifactId>
-        <version>1.2</version>
+        <version>1.3</version>
     </parent>
 
-    <artifactId>authentication-service</artifactId>
-    <version>1.0</version>
+    <artifactId>banana-authentication-service</artifactId>
+    <version>1.1</version>
     <name>${project.artifactId}</name>
     <packaging>jar</packaging>
 
-    <url>https://github.com/AromaTech/banana-authentication-service</url>
+    <url>https://github.com/RedRoma/banana-authentication-service</url>
     <description>
         Part of the Banana Service Project.
         Simplicity is paramount.
@@ -23,13 +23,13 @@
 
     <issueManagement>
         <system>GitHub Issues</system>
-        <url>https://github.com/AromaTech/banana-authentication-service/issues</url>
+        <url>https://github.com/RedRoma/banana-authentication-service/issues</url>
     </issueManagement>
 
     <scm>
-        <connection>scm:git:git@github.com:AromaTech/banana-authentication-service.git</connection>
-        <developerConnection>scm:git:git@github.com:AromaTech/banana-authentication-service.git</developerConnection>
-        <url>git@github.com:AromaTech/banana-authentication-service.git</url>
+        <connection>scm:git:git@github.com:RedRoma/banana-authentication-service.git</connection>
+        <developerConnection>scm:git:git@github.com:RedRoma/banana-authentication-service.git</developerConnection>
+        <url>git@github.com:RedRoma/banana-authentication-service.git</url>
     </scm>
 
     <inceptionYear>2015</inceptionYear>
@@ -41,8 +41,35 @@
     <!-- END OF POM METADATA -->
 
     <dependencies>
+        
+        <!--=======================-->
+        <!--TEST DEPENDENCIES-->
+        <!--=======================-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
 
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+        </dependency>
+        
+        <!--=======================-->
         <!--ALCHEMY-->
+        <!--=======================-->
+        <dependency>
+            <groupId>tech.sirwellington.alchemy</groupId>
+            <artifactId>alchemy-annotations</artifactId>
+            <version>1.5</version>
+        </dependency>
+
         <dependency>
             <groupId>tech.sirwellington.alchemy</groupId>
             <artifactId>alchemy-generator</artifactId>
@@ -60,51 +87,55 @@
         </dependency>
 
 
-        <!--BANANA-->
+        <!--=======================-->
+        <!--AROMA-->
+        <!--=======================-->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>banana-thrift</artifactId>
-            <version>1.4</version>
+            <version>1.6</version>
         </dependency>
 
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>banana-data-operations</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+
+        <!--=======================-->
         <!--GUICE-->
+        <!--=======================-->
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
         </dependency>
 
+
+        <!--=======================-->
         <!--LOGGING-->
+        <!--=======================-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
 
-        <!--LOGBACK-->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <scope>runtime</scope>
         </dependency>
 
-        <!--TEST DEPENDENCIES-->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-library</artifactId>
         </dependency>
+        
 
+        <!--=======================-->
         <!--CASSANDRA-->
-
+        <!--=======================-->
         <dependency>
             <groupId>tech.sirwellington.alchemy</groupId>
             <artifactId>alchemy-test</artifactId>
@@ -118,61 +149,35 @@
     </dependencies>
 
     <build>
+        
         <plugins>
 
+            <!--MANAGED DEPENDENCY-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.6</version>
                 <configuration>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>tech.aroma.banana.authentication.service.TcpServer</mainClass>
+                            <mainClass>tech.aroma.banana.authentication.service.server.TcpServer</mainClass>
+                            <useUniqueVersions>false</useUniqueVersions>
                         </manifest>
                     </archive>
                 </configuration>
             </plugin>
 
+            <!--MANAGED DEPENDENCY-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.10</version>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
 
+            <!--MANAGED DEPENDENCY-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.6</version>
-                <configuration>
-                    <descriptors>
-                        <descriptor>${project.basedir}/src/main/assembly/assembly.xml</descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
 
