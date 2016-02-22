@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.aroma.banana.authentication.service.operations;
+package tech.aroma.authentication.service.operations;
 
 import com.google.common.base.Strings;
 import javax.inject.Inject;

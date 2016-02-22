@@ -15,7 +15,7 @@
  */
 
  
-package tech.aroma.banana.authentication.service;
+package tech.aroma.authentication.service;
 
 
 import com.google.inject.AbstractModule;
@@ -23,7 +23,7 @@ import com.google.inject.Provides;
 import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.aroma.banana.authentication.service.data.TokenCreator;
+import tech.aroma.authentication.service.data.TokenCreator;
 import tech.aroma.thrift.authentication.service.AuthenticationService;
 
 /**

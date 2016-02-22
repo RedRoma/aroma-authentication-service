@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package tech.aroma.banana.authentication.service;
+package tech.aroma.authentication.service;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import tech.aroma.banana.authentication.service.data.TokenCreator;
-import tech.aroma.banana.authentication.service.operations.ModuleAuthenticationOperations;
+import tech.aroma.authentication.service.data.TokenCreator;
+import tech.aroma.authentication.service.operations.ModuleAuthenticationOperations;
 import tech.aroma.data.memory.ModuleMemoryDataRepositories;
 import tech.aroma.thrift.authentication.service.AuthenticationService;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;

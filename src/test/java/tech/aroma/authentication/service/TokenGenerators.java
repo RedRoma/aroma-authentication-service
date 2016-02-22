@@ -15,7 +15,7 @@
  */
 
  
-package tech.aroma.banana.authentication.service;
+package tech.aroma.authentication.service;
 
 
 import org.slf4j.Logger;

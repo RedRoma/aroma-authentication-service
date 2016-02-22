@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.aroma.banana.authentication.service.operations;
+package tech.aroma.authentication.service.operations;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static tech.aroma.banana.authentication.service.TokenGenerators.authenticationTokens;
+import static tech.aroma.authentication.service.TokenGenerators.authenticationTokens;
 import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.UUID;

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tech.aroma.banana.authentication.service.operations;
+package tech.aroma.authentication.service.operations;
 
 import javax.inject.Inject;
 import org.apache.thrift.TException;

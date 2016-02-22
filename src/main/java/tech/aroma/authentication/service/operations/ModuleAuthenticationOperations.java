@@ -15,7 +15,7 @@
  */
 
  
-package tech.aroma.banana.authentication.service.operations;
+package tech.aroma.authentication.service.operations;
 
 
 import com.google.inject.AbstractModule;

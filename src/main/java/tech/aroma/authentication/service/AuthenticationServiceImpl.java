@@ -1,5 +1,5 @@
 
-package tech.aroma.banana.authentication.service;
+package tech.aroma.authentication.service;
 
 /*
  * Copyright 2015 Aroma Tech.

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.aroma.banana.authentication.service.server;
+package tech.aroma.authentication.service.server;
 
 import com.google.common.collect.Lists;
 import java.util.List;
@@ -23,6 +23,7 @@ import java.util.concurrent.Executors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import tech.aroma.banana.authentication.service.server.TcpServer;
 import tech.sirwellington.alchemy.annotations.testing.IntegrationTest;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 

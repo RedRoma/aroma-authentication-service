@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.aroma.banana.authentication.service.data;
+package tech.aroma.authentication.service.data;
 
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.annotations.designs.patterns.StrategyPattern;

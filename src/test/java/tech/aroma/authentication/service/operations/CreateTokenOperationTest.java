@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.aroma.banana.authentication.service.operations;
+package tech.aroma.authentication.service.operations;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -26,7 +26,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import tech.aroma.banana.authentication.service.data.TokenCreator;
+import tech.aroma.authentication.service.data.TokenCreator;
 import tech.aroma.data.TokenRepository;
 import tech.aroma.thrift.LengthOfTime;
 import tech.aroma.thrift.authentication.AuthenticationToken;
