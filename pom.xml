@@ -8,14 +8,14 @@
         <version>1.4-SNAPSHOT</version>
     </parent>
 
-    <artifactId>banana-authentication-service</artifactId>
+    <artifactId>aroma-authentication-service</artifactId>
     <version>1.2-SNAPSHOT</version>
     <name>${project.artifactId}</name>
     <packaging>jar</packaging>
 
-    <url>https://github.com/RedRoma/banana-authentication-service</url>
+    <url>https://github.com/RedRoma/aroma-authentication-service</url>
     <description>
-        Part of the Banana Service Project.
+        Part of the Aroma Project.
         Simplicity is paramount.
         The Authentication service is responsible for the creation, storage, and verification
         of Application Tokens and User Tokens.
@@ -23,13 +23,13 @@
 
     <issueManagement>
         <system>GitHub Issues</system>
-        <url>https://github.com/RedRoma/banana-authentication-service/issues</url>
+        <url>https://github.com/RedRoma/aroma-authentication-service/issues</url>
     </issueManagement>
 
     <scm>
-        <connection>scm:git:git@github.com:RedRoma/banana-authentication-service.git</connection>
-        <developerConnection>scm:git:git@github.com:RedRoma/banana-authentication-service.git</developerConnection>
-        <url>git@github.com:RedRoma/banana-authentication-service.git</url>
+        <connection>scm:git:git@github.com:RedRoma/aroma-authentication-service.git</connection>
+        <developerConnection>scm:git:git@github.com:RedRoma/aroma-authentication-service.git</developerConnection>
+        <url>git@github.com:RedRoma/aroma-authentication-service.git</url>
     </scm>
 
     <inceptionYear>2015</inceptionYear>
