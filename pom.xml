@@ -9,11 +9,11 @@
     </parent>
 
     <artifactId>banana-authentication-service</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1</version>
     <name>${project.artifactId}</name>
     <packaging>jar</packaging>
 
-    <url>https://github.com/AromaTech/banana-authentication-service</url>
+    <url>https://github.com/RedRoma/banana-authentication-service</url>
     <description>
         Part of the Banana Service Project.
         Simplicity is paramount.
@@ -23,13 +23,13 @@
 
     <issueManagement>
         <system>GitHub Issues</system>
-        <url>https://github.com/AromaTech/banana-authentication-service/issues</url>
+        <url>https://github.com/RedRoma/banana-authentication-service/issues</url>
     </issueManagement>
 
     <scm>
-        <connection>scm:git:git@github.com:AromaTech/banana-authentication-service.git</connection>
-        <developerConnection>scm:git:git@github.com:AromaTech/banana-authentication-service.git</developerConnection>
-        <url>git@github.com:AromaTech/banana-authentication-service.git</url>
+        <connection>scm:git:git@github.com:RedRoma/banana-authentication-service.git</connection>
+        <developerConnection>scm:git:git@github.com:RedRoma/banana-authentication-service.git</developerConnection>
+        <url>git@github.com:RedRoma/banana-authentication-service.git</url>
     </scm>
 
     <inceptionYear>2015</inceptionYear>
