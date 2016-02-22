@@ -31,4 +31,8 @@
         <appender-ref ref="STDOUT"/>
     </root>
 
+    <logger name="tech.aroma.authentication.service" level="debug" />
+
+
+
 </configuration>
