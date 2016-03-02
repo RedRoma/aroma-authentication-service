@@ -48,7 +48,7 @@ public final class TcpServer
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(TcpServer.class);
-    private static final int PORT = AuthenticationServiceConstants.SERVICE_PORT;
+    private static final int DEFAULT_PORT = AuthenticationServiceConstants.SERVICE_PORT;
 
     public static void main(String[] args) throws TTransportException, SocketException
     {
@@ -60,7 +60,7 @@ public final class TcpServer
         AuthenticationService.Iface authenticationService = injector.getInstance(AuthenticationService.Iface.class);
         AuthenticationService.Processor processor = new AuthenticationService.Processor<>(authenticationService);
 
-        TServerSocket socket = new TServerSocket(PORT);
+        TServerSocket socket = new TServerSocket(DEFAULT_PORT);
         socket.getServerSocket().setSoTimeout((int) SECONDS.toMillis(30));
 
         TThreadPoolServer.Args serverArgs = new TThreadPoolServer.Args(socket)
@@ -71,7 +71,7 @@ public final class TcpServer
             .minWorkerThreads(5)
             .maxWorkerThreads(100);
         
-        LOG.info("Starting Authentication Service at port {}", PORT);
+        LOG.info("Starting Authentication Service at port {}", DEFAULT_PORT);
         
         TThreadPoolServer server = new TThreadPoolServer(serverArgs);
         server.serve();
