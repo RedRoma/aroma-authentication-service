@@ -144,7 +144,16 @@
             <groupId>com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-core</artifactId>
         </dependency>
-     
+        
+        <!--=======================-->
+        <!--COMMAND LINE PARSING-->
+        <!--=======================-->
+        <dependency>
+            <groupId>net.sf.jopt-simple</groupId>
+            <artifactId>jopt-simple</artifactId>
+            <version>4.9</version>
+        </dependency>
+        
     </dependencies>
 
     <build>
