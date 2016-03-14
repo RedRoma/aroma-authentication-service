@@ -29,6 +29,7 @@ import tech.aroma.thrift.authentication.service.InvalidateTokenRequest;
 import tech.aroma.thrift.authentication.service.InvalidateTokenResponse;
 import tech.aroma.thrift.authentication.service.VerifyTokenRequest;
 import tech.aroma.thrift.authentication.service.VerifyTokenResponse;
+import tech.aroma.thrift.generators.TokenGenerators;
 import tech.aroma.thrift.service.AromaServiceConstants;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
