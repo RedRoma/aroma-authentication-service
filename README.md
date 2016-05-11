@@ -17,11 +17,3 @@ This project builds with maven. Just run a `mvn clean install` to compile and in
 ## Requirements
 + Java 8
 + Maven
-
-# Release Notes
-## 1.1
-This 1.1 release persists token to a Cassandra Table.
-
-## 1.0
-The 1.0 is a pre-release of the Authentication Service. The interface and main operations have been fleshed out,
-but designed with only in-memory persistence. A Durable Persistent store will be the focus of the upcoming release.
