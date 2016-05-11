@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import tech.aroma.thrift.AromaConstants;
 import tech.aroma.thrift.authentication.AuthenticationToken;
 import tech.aroma.thrift.authentication.service.CreateTokenRequest;
 import tech.aroma.thrift.authentication.service.CreateTokenResponse;
@@ -30,7 +31,6 @@ import tech.aroma.thrift.authentication.service.InvalidateTokenResponse;
 import tech.aroma.thrift.authentication.service.VerifyTokenRequest;
 import tech.aroma.thrift.authentication.service.VerifyTokenResponse;
 import tech.aroma.thrift.generators.TokenGenerators;
-import tech.aroma.thrift.service.AromaServiceConstants;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
@@ -144,7 +144,7 @@ public class AuthenticationServiceImplTest
     public void testGetApiVersion() throws Exception
     {
         double response = instance.getApiVersion();
-        assertThat(response, is(AromaServiceConstants.API_VERSION));
+        assertThat(response, is(AromaConstants.API_VERSION));
 
     }
 
