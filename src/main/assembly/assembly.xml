@@ -16,7 +16,7 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/src/main/docker</directory>
+            <directory>${project.basedir}/src/main/beanstalk</directory>
             <outputDirectory>./</outputDirectory>
         </fileSet>
         <fileSet>

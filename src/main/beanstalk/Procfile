@@ -1,0 +1,1 @@
+service: java -jar aroma-authentication-service-1.2.jar -Xmms:512m --port 5000

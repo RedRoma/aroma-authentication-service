@@ -3,19 +3,19 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>tech.aroma.banana</groupId>
-        <artifactId>banana</artifactId>
-        <version>1.3</version>
+        <groupId>tech.aroma</groupId>
+        <artifactId>aroma</artifactId>
+        <version>1.5</version>
     </parent>
 
-    <artifactId>banana-authentication-service</artifactId>
-    <version>1.1</version>
+    <artifactId>aroma-authentication-service</artifactId>
+    <version>1.2</version>
     <name>${project.artifactId}</name>
     <packaging>jar</packaging>
 
-    <url>https://github.com/RedRoma/banana-authentication-service</url>
+    <url>https://github.com/RedRoma/aroma-authentication-service</url>
     <description>
-        Part of the Banana Service Project.
+        Part of the Aroma Project.
         Simplicity is paramount.
         The Authentication service is responsible for the creation, storage, and verification
         of Application Tokens and User Tokens.
@@ -23,13 +23,13 @@
 
     <issueManagement>
         <system>GitHub Issues</system>
-        <url>https://github.com/RedRoma/banana-authentication-service/issues</url>
+        <url>https://github.com/RedRoma/aroma-authentication-service/issues</url>
     </issueManagement>
 
     <scm>
-        <connection>scm:git:git@github.com:RedRoma/banana-authentication-service.git</connection>
-        <developerConnection>scm:git:git@github.com:RedRoma/banana-authentication-service.git</developerConnection>
-        <url>git@github.com:RedRoma/banana-authentication-service.git</url>
+        <connection>scm:git:git@github.com:RedRoma/aroma-authentication-service.git</connection>
+        <developerConnection>scm:git:git@github.com:RedRoma/aroma-authentication-service.git</developerConnection>
+        <url>git@github.com:RedRoma/aroma-authentication-service.git</url>
     </scm>
 
     <inceptionYear>2015</inceptionYear>
@@ -67,7 +67,6 @@
         <dependency>
             <groupId>tech.sirwellington.alchemy</groupId>
             <artifactId>alchemy-annotations</artifactId>
-            <version>1.5</version>
         </dependency>
 
         <dependency>
@@ -92,16 +91,22 @@
         <!--=======================-->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>banana-thrift</artifactId>
-            <version>1.6</version>
+            <artifactId>aroma-thrift</artifactId>
+            <version>1.9</version>
         </dependency>
-
+        
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>banana-data-operations</artifactId>
-            <version>1.0</version>
+            <artifactId>aroma-data-operations</artifactId>
+            <version>1.1</version>
         </dependency>
-
+        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>aroma-thrift-generators</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
+        </dependency>
 
         <!--=======================-->
         <!--GUICE-->
@@ -145,7 +150,15 @@
             <groupId>com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-core</artifactId>
         </dependency>
-     
+        
+        <!--=======================-->
+        <!--COMMAND LINE PARSING-->
+        <!--=======================-->
+        <dependency>
+            <groupId>net.sf.jopt-simple</groupId>
+            <artifactId>jopt-simple</artifactId>
+        </dependency>
+ 
     </dependencies>
 
     <build>
@@ -161,7 +174,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>tech.aroma.banana.authentication.service.server.TcpServer</mainClass>
+                            <mainClass>tech.aroma.authentication.service.server.TcpServer</mainClass>
                             <useUniqueVersions>false</useUniqueVersions>
                         </manifest>
                     </archive>
