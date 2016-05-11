@@ -1,6 +1,6 @@
 FROM williamyeh/docker-java8
 
-ADD aroma-authentication-service-1.2-SNAPSHOT.jar aroma-authentication-service.jar
+ADD aroma-authentication-service-1.3-SNAPSHOT.jar aroma-authentication-service.jar
 ADD lib lib
 
 RUN apt-get update -y
