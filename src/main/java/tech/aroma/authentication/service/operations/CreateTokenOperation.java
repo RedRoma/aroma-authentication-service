@@ -53,7 +53,7 @@ final class CreateTokenOperation implements ThriftOperation<CreateTokenRequest, 
 {
 
     private final static Logger LOG = LoggerFactory.getLogger(CreateTokenOperation.class);
-    private final static LengthOfTime DEFAULT_LIFETIME = new LengthOfTime(TimeUnit.DAYS, 60);
+    private final static LengthOfTime DEFAULT_LIFETIME = new LengthOfTime(TimeUnit.DAYS, 90);
 
     private final Function<LengthOfTime, Duration> lengthOfTimeConverter;
     private final TokenCreator tokenCreator;
