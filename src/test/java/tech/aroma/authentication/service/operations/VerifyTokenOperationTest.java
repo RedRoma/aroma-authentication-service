@@ -20,9 +20,13 @@ import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import tech.aroma.data.TokenRepository;
+import tech.aroma.thrift.authentication.AuthenticationToken;
+import tech.aroma.thrift.authentication.TokenStatus;
 import tech.aroma.thrift.authentication.service.VerifyTokenRequest;
 import tech.aroma.thrift.authentication.service.VerifyTokenResponse;
 import tech.aroma.thrift.exceptions.InvalidArgumentException;
@@ -30,6 +34,7 @@ import tech.aroma.thrift.exceptions.InvalidTokenException;
 import tech.aroma.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
+import tech.sirwellington.alchemy.test.junit.runners.GenerateString;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.*;
@@ -39,7 +44,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import static tech.aroma.thrift.authentication.TokenStatus.EXPIRED;
+import static tech.aroma.thrift.generators.TokenGenerators.authenticationTokens;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.TimeGenerators.pastInstants;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
+import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.UUID;
 
 /**
  *
@@ -52,25 +62,37 @@ public class VerifyTokenOperationTest
     @Mock
     private TokenRepository repository;
 
+    private AuthenticationToken token;
+    
     @GeneratePojo
     private VerifyTokenRequest request;
     
+    @GenerateString(UUID)
     private String tokenId;
+    
+    @GenerateString(UUID)
     private String ownerId;
     
     private VerifyTokenOperation instance;
 
+    @Captor
+    private ArgumentCaptor<AuthenticationToken> captor;
+    
     @Before
     public void setUp() throws TException
     {
         instance = new VerifyTokenOperation(repository);
         verifyZeroInteractions(repository);
         
-        tokenId = request.tokenId;
-        ownerId = request.ownerId;
+        token = one(authenticationTokens());
+        request.tokenId = tokenId;
+        request.ownerId = ownerId;
+        token.tokenId = tokenId;
+        token.ownerId = ownerId;
         
         when(repository.containsToken(tokenId)).thenReturn(true);
         when(repository.doesTokenBelongTo(tokenId, ownerId)).thenReturn(true);
+        when(repository.getToken(tokenId)).thenReturn(token);
     }
 
     @Test
@@ -97,7 +119,7 @@ public class VerifyTokenOperationTest
         VerifyTokenResponse response = instance.process(request);
         assertThat(response, notNullValue());
         
-        verify(repository).containsToken(tokenId);
+        verify(repository).getToken(tokenId);
         verify(repository, never()).doesTokenBelongTo(eq(tokenId), Mockito.any());
     }
     
@@ -118,6 +140,9 @@ public class VerifyTokenOperationTest
     {
         when(repository.containsToken(tokenId))
             .thenReturn(false);
+        
+        when(repository.getToken(tokenId))
+            .thenThrow(new InvalidTokenException());
 
         request.unsetOwnerId();
 
@@ -150,6 +175,31 @@ public class VerifyTokenOperationTest
         badRequest.ownerId = ownerId;
         assertThrows(() -> instance.process(badRequest))
             .isInstanceOf(InvalidArgumentException.class);
+        
+    }
+    
+    @Test
+    public void testWhenTokenExpired() throws Exception
+    {
+        token.setStatus(TokenStatus.EXPIRED);
+        
+        assertThrows(() -> instance.process(request))
+            .isInstanceOf(InvalidTokenException.class);
+    }
+    
+    @Test
+    public void testWhenTokenHasRecentlyExpired() throws Exception
+    {
+        long pastTimestamp = one(pastInstants()).toEpochMilli();
+        token.setTimeOfExpiration(pastTimestamp);
+        
+        assertThrows(() -> instance.process(request));
+        
+        verify(repository).saveToken(captor.capture());
+        
+        AuthenticationToken savedToken = captor.getValue();
+        assertThat(savedToken, is(token));
+        assertThat(savedToken.status, is(EXPIRED));
         
     }
 

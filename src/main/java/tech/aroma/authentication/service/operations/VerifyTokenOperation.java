@@ -22,16 +22,21 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.data.TokenRepository;
+import tech.aroma.thrift.authentication.AuthenticationToken;
+import tech.aroma.thrift.authentication.TokenStatus;
 import tech.aroma.thrift.authentication.service.VerifyTokenRequest;
 import tech.aroma.thrift.authentication.service.VerifyTokenResponse;
 import tech.aroma.thrift.exceptions.InvalidTokenException;
 import tech.aroma.thrift.exceptions.OperationFailedException;
+import tech.aroma.thrift.functions.TimeFunctions;
 import tech.sirwellington.alchemy.annotations.access.Internal;
+import tech.sirwellington.alchemy.arguments.AlchemyAssertion;
+import tech.sirwellington.alchemy.arguments.FailedAssertionException;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
-import static tech.aroma.data.assertions.AuthenticationAssertions.tokenInRepository;
 import static tech.aroma.thrift.assertions.AromaAssertions.checkRequestNotNull;
 import static tech.aroma.thrift.assertions.AromaAssertions.withMessage;
+import static tech.aroma.thrift.authentication.TokenStatus.EXPIRED;
 import static tech.sirwellington.alchemy.arguments.Arguments.checkThat;
 import static tech.sirwellington.alchemy.arguments.assertions.Assertions.notNull;
 import static tech.sirwellington.alchemy.arguments.assertions.StringAssertions.nonEmptyString;
@@ -66,15 +71,28 @@ final class VerifyTokenOperation implements ThriftOperation<VerifyTokenRequest, 
         String tokenId = request.tokenId;
         checkThat(tokenId)
             .throwing(withMessage("missing tokenId"))
-            .is(nonEmptyString())
+            .is(nonEmptyString());
+        
+        AuthenticationToken token = repository.getToken(tokenId);
+        
+        checkThat(token)
             .throwing(InvalidTokenException.class)
-            .is(tokenInRepository(repository));
+            .usingMessage("Token is expired")
+            .is(notExpired());
+
+        //Update and check if the token is expired.
+        if(expirationDateHasPassed(token))
+        {
+            saveAsExpired(token);
+            throw new InvalidTokenException("Token has expired.");
+        }
 
         if (shouldCheckAgainstOwner(request))
         {
             String ownerId = request.ownerId;
             ensureTokenAndOwnerMatch(tokenId, ownerId);
         }
+        
 
         return new VerifyTokenResponse();
 
@@ -111,5 +129,30 @@ final class VerifyTokenOperation implements ThriftOperation<VerifyTokenRequest, 
 
         return match;
     }
+    
+    private AlchemyAssertion<AuthenticationToken> notExpired()
+    {
+        return token ->
+        {
+            if (token.status == EXPIRED)
+            {
+                throw new FailedAssertionException("Token has expired");
+            }
+        };
+    }
+
+    private void saveAsExpired(AuthenticationToken token) throws TException
+    {
+        token.setStatus(TokenStatus.EXPIRED);
+        
+        repository.saveToken(token);
+    }
+
+    private boolean expirationDateHasPassed(AuthenticationToken token)
+    {
+        return TimeFunctions.isInThePast(token.timeOfExpiration);
+    }
+
+
 
 }

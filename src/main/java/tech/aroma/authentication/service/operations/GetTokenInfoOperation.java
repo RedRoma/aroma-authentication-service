@@ -77,7 +77,7 @@ final class GetTokenInfoOperation implements ThriftOperation<GetTokenInfoRequest
 
         AuthenticationToken token = tryGetToken(tokenId);
         
-        if (isExpired(token))
+        if (expirationDateHasPassed(token))
         {
             saveAsExpired(token);
         }
@@ -105,7 +105,7 @@ final class GetTokenInfoOperation implements ThriftOperation<GetTokenInfoRequest
         return token;
     }
 
-    private boolean isExpired(AuthenticationToken token)
+    private boolean expirationDateHasPassed(AuthenticationToken token)
     {
         return TimeFunctions.isInThePast(token.timeOfExpiration);
     }
