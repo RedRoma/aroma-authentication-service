@@ -28,6 +28,7 @@ import tech.aroma.data.TokenRepository;
 import tech.aroma.thrift.LengthOfTime;
 import tech.aroma.thrift.TimeUnit;
 import tech.aroma.thrift.authentication.AuthenticationToken;
+import tech.aroma.thrift.authentication.TokenStatus;
 import tech.aroma.thrift.authentication.service.CreateTokenRequest;
 import tech.aroma.thrift.authentication.service.CreateTokenResponse;
 import tech.aroma.thrift.exceptions.OperationFailedException;
@@ -112,7 +113,8 @@ final class CreateTokenOperation implements ThriftOperation<CreateTokenRequest, 
             .setOrganizationName(request.ownerName)
             .setTokenType(request.desiredTokenType)
             .setTimeOfCreation(timeOfCreation.toEpochMilli())
-            .setTimeOfExpiration(timeOfExpiration.toEpochMilli());
+            .setTimeOfExpiration(timeOfExpiration.toEpochMilli())
+            .setStatus(TokenStatus.ACTIVE);
 
         repository.saveToken(token);
         LOG.debug("Saved token to repository: {}", token);
