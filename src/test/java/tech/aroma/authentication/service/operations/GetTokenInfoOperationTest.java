@@ -19,27 +19,36 @@ package tech.aroma.authentication.service.operations;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import tech.aroma.data.TokenRepository;
 import tech.aroma.thrift.authentication.AuthenticationToken;
+import tech.aroma.thrift.authentication.TokenStatus;
 import tech.aroma.thrift.authentication.service.GetTokenInfoRequest;
 import tech.aroma.thrift.authentication.service.GetTokenInfoResponse;
 import tech.aroma.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.thrift.exceptions.OperationFailedException;
 import tech.sirwellington.alchemy.test.junit.runners.AlchemyTestRunner;
+import tech.sirwellington.alchemy.test.junit.runners.DontRepeat;
 import tech.sirwellington.alchemy.test.junit.runners.GeneratePojo;
 import tech.sirwellington.alchemy.test.junit.runners.Repeat;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import static tech.aroma.thrift.generators.TokenGenerators.authenticationTokens;
+import static tech.sirwellington.alchemy.generator.AlchemyGenerator.one;
+import static tech.sirwellington.alchemy.generator.TimeGenerators.pastInstants;
 import static tech.sirwellington.alchemy.test.junit.ThrowableAssertion.assertThrows;
 
 /**
  *
  * @author SirWellington
  */
+@Repeat(100)
 @RunWith(AlchemyTestRunner.class)
 public class GetTokenInfoOperationTest
 {
@@ -49,10 +58,12 @@ public class GetTokenInfoOperationTest
     @GeneratePojo
     private GetTokenInfoRequest request;
     
-    @GeneratePojo
     private AuthenticationToken token;
     
     private GetTokenInfoOperation instance;
+    
+    @Captor
+    private ArgumentCaptor<AuthenticationToken> captor;
     
     @Before
     public void setUp() throws Exception
@@ -60,13 +71,14 @@ public class GetTokenInfoOperationTest
         instance = new GetTokenInfoOperation(repository);
         verifyZeroInteractions(repository);
         
+        token = one(authenticationTokens());
+        
         when(repository.getToken(token.getTokenId()))
             .thenReturn(token);
         
         request.setTokenId(token.getTokenId());
     }
     
-    @Repeat(100)
     @Test
     public void testProcess() throws Exception
     {
@@ -75,6 +87,7 @@ public class GetTokenInfoOperationTest
         assertThat(response.token, is(token));
     }
     
+    @DontRepeat
     @Test
     public void testProcessEdgeCases() throws Exception
     {
@@ -82,6 +95,7 @@ public class GetTokenInfoOperationTest
             .isInstanceOf(InvalidArgumentException.class);
     }
     
+    @DontRepeat
     @Test
     public void testWhenRepositoryFails() throws Exception
     {
@@ -90,9 +104,8 @@ public class GetTokenInfoOperationTest
         
         assertThrows(() -> instance.process(request))
             .isInstanceOf(OperationFailedException.class);
-            
     }
-    
+
     @Test
     public void testWhenRepositoryReturnsNull() throws Exception
     {
@@ -101,5 +114,24 @@ public class GetTokenInfoOperationTest
         
         assertThrows(() -> instance.process(request))
             .isInstanceOf(OperationFailedException.class);
+    }
+    
+    @Test
+    public void testWhenTokenIsExpired() throws Exception
+    {
+        long pastTimestamp = one(pastInstants()).toEpochMilli();
+        token.setTimeOfExpiration(pastTimestamp);
+        
+        assertThat(token.status, is(TokenStatus.ACTIVE));
+        
+        GetTokenInfoResponse response = instance.process(request);
+        assertThat(response.token, is(token));
+        assertThat(response.token.status, is(TokenStatus.EXPIRED));
+     
+        verify(repository).saveToken(captor.capture());
+        
+        AuthenticationToken savedToken = captor.getValue();
+        assertThat(savedToken, is(token));
+        assertThat(savedToken.status, is(TokenStatus.EXPIRED));
     }
 }

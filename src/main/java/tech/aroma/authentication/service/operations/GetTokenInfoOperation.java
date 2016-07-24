@@ -22,10 +22,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.data.TokenRepository;
 import tech.aroma.thrift.authentication.AuthenticationToken;
+import tech.aroma.thrift.authentication.TokenStatus;
 import tech.aroma.thrift.authentication.service.GetTokenInfoRequest;
 import tech.aroma.thrift.authentication.service.GetTokenInfoResponse;
 import tech.aroma.thrift.exceptions.InvalidArgumentException;
 import tech.aroma.thrift.exceptions.OperationFailedException;
+import tech.aroma.thrift.functions.TimeFunctions;
 import tech.sirwellington.alchemy.annotations.access.Internal;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
@@ -75,6 +77,11 @@ final class GetTokenInfoOperation implements ThriftOperation<GetTokenInfoRequest
 
         AuthenticationToken token = tryGetToken(tokenId);
         
+        if (isExpired(token))
+        {
+            saveAsExpired(token);
+        }
+        
         return new GetTokenInfoResponse().setToken(token);
     }
 
@@ -96,6 +103,17 @@ final class GetTokenInfoOperation implements ThriftOperation<GetTokenInfoRequest
             .is(notNull());
 
         return token;
+    }
+
+    private boolean isExpired(AuthenticationToken token)
+    {
+        return TimeFunctions.isInThePast(token.timeOfExpiration);
+    }
+
+    private void saveAsExpired(AuthenticationToken token) throws TException
+    {
+        token.setStatus(TokenStatus.EXPIRED);
+        tokenRepository.saveToken(token);
     }
 
 }
