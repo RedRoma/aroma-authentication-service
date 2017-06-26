@@ -18,22 +18,14 @@
 package tech.aroma.authentication.service.operations;
 
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
 import java.time.Duration;
 import java.util.function.Function;
+
+import com.google.inject.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.aroma.thrift.LengthOfTime;
-import tech.aroma.thrift.authentication.service.CreateTokenRequest;
-import tech.aroma.thrift.authentication.service.CreateTokenResponse;
-import tech.aroma.thrift.authentication.service.GetTokenInfoRequest;
-import tech.aroma.thrift.authentication.service.GetTokenInfoResponse;
-import tech.aroma.thrift.authentication.service.InvalidateTokenRequest;
-import tech.aroma.thrift.authentication.service.InvalidateTokenResponse;
-import tech.aroma.thrift.authentication.service.VerifyTokenRequest;
-import tech.aroma.thrift.authentication.service.VerifyTokenResponse;
+import tech.aroma.thrift.authentication.service.*;
 import tech.aroma.thrift.functions.TimeFunctions;
 import tech.sirwellington.alchemy.thrift.operations.ThriftOperation;
 
@@ -66,7 +58,7 @@ public final class ModuleAuthenticationOperations extends AbstractModule
     @Provides
     Function<LengthOfTime, Duration> provideLengthOfTimeConverter()
     {
-        return TimeFunctions.LENGTH_OF_TIME_TO_DURATION;
+        return TimeFunctions.lengthOfTimeToDuration();
     }
     
 }

@@ -56,7 +56,7 @@ import static tech.sirwellington.alchemy.test.junit.runners.GenerateString.Type.
 public class CreateTokenOperationTest 
 {
 
-    private final Function<LengthOfTime, Duration> lengthOfTimeConverter = TimeFunctions.LENGTH_OF_TIME_TO_DURATION;
+    private final Function<LengthOfTime, Duration> lengthOfTimeConverter = TimeFunctions.lengthOfTimeToDuration();
     
     @Mock
     private TokenCreator tokenCreator;
